@@ -18,5 +18,12 @@
     "require": {
         "php": "^8.2",
         "illuminate/support": "^11.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Uspdev\\Forms\\FormServiceProvider"
+            ]
+        }
     }
 }
