@@ -167,6 +167,7 @@ class Form
     protected function generateField($field)
     {
         $bs = config('uspdev-forms.bootstrapVersion');
+        $value = array_key_exists('value', $field) ? $field['value'] : "";
 
         $required = isset($field['required']) && $field['required'] ? 'required' : '';
         $requiredLabel = $required ? ' <span class="text-danger">*</span>' : '';
@@ -200,8 +201,9 @@ class Form
         } else {
 
             $html = '<div class="' . $formGroupClass . '">';
-            $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
-            $html .= '<input id="' . $fieldId . '" type="' . $field['type'] . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . ' />';
+            $html .= '<label for="' . $fieldId . '">' . isset($field['label']) ? $field['label'] : "" . $requiredLabel . '</label>';
+            $html .= '<input id="' . $fieldId . '" type="' . $field['type'] . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required .'
+            value="'. $value .'" />';
             $html .= '</div>' . PHP_EOL;
         }
 
