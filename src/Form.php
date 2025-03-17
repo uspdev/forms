@@ -178,6 +178,10 @@ class Form
 
         $fieldId = 'uspdev-laravel-form-' . $field['name'];
 
+        if ($field['type'] === 'hidden') {
+            return '<input type="hidden" name="' . $field['name'] . '" value="' . ($field['value'] ?? '') . '">' . PHP_EOL;
+        }
+
         if ($field['type'] === 'textarea') {
 
             $html = '<div class="' . $formGroupClass . '">';
