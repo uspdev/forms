@@ -21,8 +21,8 @@ Forms é uma biblioteca **uspdev** que permite gerar formulários dinâmicos a p
 
 Run the following commands to publish the package's configuration and migrations:
 
-    php artisan vendor:publish --provider="Uspdev\Forms\Providers\FormServiceProvider" --tag=config
-    php artisan vendor:publish --provider="Uspdev\Forms\Providers\FormServiceProvider" --tag=migrations
+    php artisan vendor:publish --tag=forms-migrations
+    php artisan vendor:publish --tag=forms-config
 
 
 3. **Run migrations:**
