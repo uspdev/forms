@@ -180,10 +180,8 @@ class Form
 
         if ($field['type'] === 'hidden') {
             return '<input type="hidden" name="' . $field['name'] . '" value="' . ($field['value'] ?? '') . '">' . PHP_EOL;
-        }
-
-        if ($field['type'] === 'textarea') {
-
+        } elseif ($field['type'] === 'textarea') {
+            
             $html = '<div class="' . $formGroupClass . '">';
             $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
             $html .= '<textarea id="' . $fieldId . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . '></textarea>';
