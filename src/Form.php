@@ -167,7 +167,7 @@ class Form
     protected function generateField($field)
     {
         $bs = config('uspdev-forms.bootstrapVersion');
-
+       
         $required = isset($field['required']) && $field['required'] ? 'required' : '';
         $requiredLabel = $required ? ' <span class="text-danger">*</span>' : '';
 
@@ -178,8 +178,10 @@ class Form
 
         $fieldId = 'uspdev-laravel-form-' . $field['name'];
 
-        if ($field['type'] === 'textarea') {
-
+        if ($field['type'] === 'hidden') {
+            return '<input type="hidden" name="' . $field['name'] . '" value="' . ($field['value'] ?? '') . '">' . PHP_EOL;
+        } elseif ($field['type'] === 'textarea') {
+            
             $html = '<div class="' . $formGroupClass . '">';
             $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
             $html .= '<textarea id="' . $fieldId . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . '></textarea>';
@@ -198,10 +200,13 @@ class Form
             $html .= '</div>' . PHP_EOL;
 
         } else {
+            $value = array_key_exists('value', $field) ? $field['value'] : "";
+            $label = isset($field['label']) ? $field['label'] : "";
 
             $html = '<div class="' . $formGroupClass . '">';
-            $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
-            $html .= '<input id="' . $fieldId . '" type="' . $field['type'] . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . ' />';
+            $html .= '<label for="' . $fieldId . '">' . $label  . $requiredLabel . '</label>';
+            $html .= '<input id="' . $fieldId . '" type="' . $field['type'] . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required .'
+            value="'. $value .'" />';
             $html .= '</div>' . PHP_EOL;
         }
 
