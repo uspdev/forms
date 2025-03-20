@@ -26,7 +26,9 @@ class Form
     /** corresponde ao campo action do formulário */
     public $action;
 
-    public function __construct($key = null, $config = [])
+    public $updateMode;
+
+    public function __construct($key = null, $config = [],)
     {
         $this->key = $key ?: config('uspdev-forms.defaultKey');
         $this->method = config('uspdev-forms.defaultMethod');
@@ -35,6 +37,7 @@ class Form
         $this->btnSize = config('uspdev-forms.formSize') == 'small' ? ' btn-sm ' : '';
 
         $this->action = isset($config['action']) ? $config['action'] : null;
+        $this->updateMode = isset($config['updateMode']) ? $config['updateMode'] : null;
     }
 
     /**
@@ -48,11 +51,17 @@ class Form
      * @param $request->user
      * @return FormSubmission $formSubmission
      */
-    public function handleSubmission(Request $request)
+    public function handleSubmission(Request $request, $id = null)
     {
         // Lets store only valid form fields
         $data = $this->validate($request);
+        if ($this->updateMode) {
+            $form = FormSubmission::where('id', $id)->firstOrFail();
+            $form->data = $data;
+            $form->save();
 
+            return $form;
+        }
         $formSubmission = FormSubmission::Create([
             'form_definition_id' => $this->definition->id,
             'user_id' => $request->user() ? $request->user()->id : null,
@@ -129,7 +138,7 @@ class Form
      * @param String $formName ID of form definition
      * @return String HTML formatted
      */
-    public function generateHtml(String $formName)
+    public function generateHtml(String $formName, $formSubmission = null)
     {
         if (!($this->definition = $this->getDefinition($formName))) {
             return null;
@@ -142,12 +151,12 @@ class Form
                 // agrupando campos na mesma linha: igual para bs4 e bs5
                 $fields .= '<div class="row">';
                 foreach ($field as $f) {
-                    $fields .= '<div class="col">' . $this->generateField($f) . '</div>';
+                    $fields .= '<div class="col">' . $this->generateField($f, $formSubmission) . '</div>';
                 }
                 $fields .= '</div>';
             } else {
                 // a linha possui um campo somente
-                $fields .= $this->generateField($field);
+                $fields .= $this->generateField($field, $formSubmission);
             }
         }
 
@@ -162,7 +171,7 @@ class Form
     /**
      * Generates fields for the form generator
      */
-    protected function generateField($field)
+    protected function generateField($field, $formSubmission)
     {
         $bs = config('uspdev-forms.bootstrapVersion');
         $required = isset($field['required']) && $field['required'] ? 'required' : '';
@@ -173,13 +182,15 @@ class Form
         $f = compact('bs', 'required', 'requiredLabel', 'formGroupClass', 'controlClass', 'id', 'field');
 
         if ($field['type'] === 'textarea') {
-            $html = view('uspdev-forms::partials.textarea', compact('f'))->render();
+            $html = view('uspdev-forms::partials.textarea', compact('f','formSubmission'))->render();
         } elseif ($field['type'] === 'select') {
-            $html = view('uspdev-forms::partials.select', compact('f'))->render();
+            $html = view('uspdev-forms::partials.select', compact('f','formSubmission'))->render();
+        } elseif ($field['type'] === 'checkbox') {
+            $html = view('uspdev-forms::partials.checkbox', compact('f','formSubmission'))->render();
         } elseif ($field['type'] === 'pessoa-usp') {
-            $html = view('uspdev-forms::partials.pessoa-usp', compact('f'))->render();
+            $html = view('uspdev-forms::partials.pessoa-usp', compact('f','formSubmission'))->render();
         } else {
-            $html = view('uspdev-forms::partials.default', compact('f'))->render();
+            $html = view('uspdev-forms::partials.default', compact('f','formSubmission'))->render();
         }
 
         return $html;
@@ -196,6 +207,14 @@ class Form
         }
 
         return FormSubmission::where($cond)->get();
+    }
+
+    /**
+     * Get a form submission by id
+     */
+    public function getSubmission($id)
+    {
+        return FormSubmission::find($id);
     }
 
     /**

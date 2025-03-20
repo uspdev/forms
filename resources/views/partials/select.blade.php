@@ -6,7 +6,10 @@
 
     <option selected disabled hidden value="">Selecione um ..</option>
     @foreach ($f['field']['options'] as $o)
-      <option>{{ $o }}</option>
+      <option value="{{ $o }}" 
+        @if (isset($formSubmission) && $formSubmission->data[$f['field']['name']] == $o) selected @endif>
+        {{ $o }}
+      </option>
     @endforeach
   </select>
 </div>
