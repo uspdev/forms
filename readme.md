@@ -46,6 +46,12 @@ $form = [
     'description' => 'A form for user inquiries.',
     'fields' => [
       [
+        'name' => 'codpes',
+        'type' => 'pessoa-usp',
+        'label' => 'Pessoa (select2)',
+        'required' => true
+      ],
+      [
         [
           'name' => 'name',
           'type' => 'text',
