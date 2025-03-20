@@ -34,7 +34,7 @@
   });
 
   function initSelect2() {
-    var $oSelect2 = $('#uspdev-forms-pessoa-usp').find(':input[name=codpes]');
+    var $oSelect2 = $('#{{ $f['id'] }}');
 
     $oSelect2.select2({
       ajax: {
