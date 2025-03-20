@@ -83,21 +83,27 @@ FormDefinition::create($form);
 
 Use the FormGenerator class to render the form in your Blade template:
 
-    use Uspdev\Forms\FormGenerator;
+```php
+use Uspdev\Forms\Forms;
 
-    $formGenerator = new FormGenerator(storage_path('forms/contact_form.yaml'));
-    echo $formGenerator->generateForm();
+$form = new Form($key = null, ['action' => route('sua-rota-do-action')]);
+$formHtml = $form->generateHtml('contact_form'); // conforme definido em $form
+
+// ....
+```
 
 3. **Handle form submissions:**
 
 In your controller, handle the form submission by saving the data to the database:
 
-
-    public function submit(Request $request)
-    {
-        // Validate and store form data...
-    }
-    
+```php
+public function store(Request $request)
+{
+  $form = (new Form())->handleSubmission($request);
+  
+  // ....
+}
+```
     
 ## Contributing
 

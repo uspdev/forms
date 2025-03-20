@@ -10,24 +10,31 @@ use Uspdev\Forms\Models\FormSubmission;
 class Form
 {
 
+    /** Chave definida pelo usuário para esta instancia do form */
     public $key;
-    public $method;
+    
     public $group;
     public $btnLabel;
+    public $btnSize;
 
-    public $formId;
+    /** formDefinition object */
+    public $definition;
 
-    public $action; // sem uso por enquanto
+    /** Metodo do form */
+    public $method;
+    
+    /** corresponde ao campo action do formulário */
+    public $action;
 
-    public function __construct($key = null, $name = null)
+    public function __construct($key = null, $config = [])
     {
         $this->key = $key ?: config('uspdev-forms.defaultKey');
         $this->method = config('uspdev-forms.defaultMethod');
         $this->group = config('uspdev-forms.defaultGroup');
         $this->btnLabel = config('uspdev-forms.defaultBtnLabel');
+        $this->btnSize = config('uspdev-forms.formSize') == 'small' ? ' btn-sm ' : '';
 
-        $this->action = '';
-
+        $this->action = isset($config['action']) ? $config['action'] : null;
     }
 
     /**
@@ -36,7 +43,7 @@ class Form
      * Dentro do request precisa ter form_definition, form_key
      * user é opcional para o caso do form ser aberto
      *
-     * @param $request->formDefinition
+     * @param $request->form_definition
      * @param $request->form_key
      * @param $request->user
      * @return FormSubmission $formSubmission
@@ -47,7 +54,7 @@ class Form
         $data = $this->validate($request);
 
         $formSubmission = FormSubmission::Create([
-            'form_definition_id' => $this->formId,
+            'form_definition_id' => $this->definition->id,
             'user_id' => $request->user() ? $request->user()->id : null,
             'key' => $request->form_key,
             'data' => $data,
@@ -62,14 +69,12 @@ class Form
     public function validate($request)
     {
         // Retrieve the form definition by id
-        if (!($formDefinition = $this->getDefinition($request->form_definition))) {
+        if (!($this->definition = $this->getDefinition($request->form_definition))) {
             return response()->json('Error on finding form definition');
         }
 
-        $this->formId = $formDefinition->id;
-
         // Validate the incoming request data based on form fields
-        $rules = $this->getFormValidationRules($formDefinition);
+        $rules = $this->getValidationRules();
         $validator = Validator::make($request->all(), $rules);
 
         // Handle validation failure
@@ -84,11 +89,11 @@ class Form
     /**
      * Retorna as regras de validação para os campos do form
      */
-    protected function getFormValidationRules($form)
+    protected function getValidationRules()
     {
         $rules = [];
 
-        foreach ($form->fields as $field) {
+        foreach ($this->definition->fields as $field) {
 
             if (array_is_list($field)) {
                 foreach ($field as $f) {
@@ -122,41 +127,34 @@ class Form
      * Generates HTML FORM from Form Definition
      *
      * @param String $formName ID of form definition
-     * @param String $form_key Application key associated to this form/submissions
      * @return String HTML formatted
      */
     public function generateHtml(String $formName)
     {
-        if (!($formDefinition = $this->getDefinition($formName))) {
+        if (!($this->definition = $this->getDefinition($formName))) {
             return null;
         }
 
-        $btnSize = config('uspdev-forms.formSize') == 'small' ? ' btn-sm ' : '';
-
-        $form = '<form action="' . $this->action . '" method="' . $this->method . '" name="' . $formDefinition->name . '">';
-        $form .= '<input type="hidden" name="form_definition" value="' . $formDefinition->name . '">' . PHP_EOL;
-        $form .= '<input type="hidden" name="form_key" value="' . $this->key . '">' . PHP_EOL;
-        $form .= csrf_field() . PHP_EOL;
-
-        foreach ($formDefinition->fields as $field) {
+        $fields = '';
+        foreach ($this->definition->fields as $field) {
 
             if (array_is_list($field)) {
                 // agrupando campos na mesma linha: igual para bs4 e bs5
-                $form .= '<div class="row">';
+                $fields .= '<div class="row">';
                 foreach ($field as $f) {
-                    $form .= ' <div class="col">';
-                    $form .= $this->generateField($f);
-                    $form .= '</div>';
+                    $fields .= '<div class="col">' . $this->generateField($f) . '</div>';
                 }
-                $form .= '</div>';
+                $fields .= '</div>';
             } else {
                 // a linha possui um campo somente
-                $form .= $this->generateField($field);
+                $fields .= $this->generateField($field);
             }
         }
 
-        $form .= '<button type="submit" class="btn btn-primary ' . $btnSize . '">' . $this->btnLabel . '</button>' . PHP_EOL;
-        $form .= '</form>' . PHP_EOL;
+        $form = view('uspdev-forms::partials.form', [
+            'form' => $this,
+            'fields' => $fields,
+        ])->render();
 
         return $form;
     }
@@ -167,47 +165,21 @@ class Form
     protected function generateField($field)
     {
         $bs = config('uspdev-forms.bootstrapVersion');
-       
         $required = isset($field['required']) && $field['required'] ? 'required' : '';
         $requiredLabel = $required ? ' <span class="text-danger">*</span>' : '';
-
         $formGroupClass = $bs == 5 ? 'mb-3' : 'form-group';
+        $controlClass = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
+        $id = 'uspdev-forms-' . $field['name'];
+        $f = compact('bs', 'required', 'requiredLabel', 'formGroupClass', 'controlClass', 'id', 'field');
 
-        $formControlClass = $bs == 5 ? 'form-control' : 'form-control';
-        $formControlClass .= config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '';
-
-        $fieldId = 'uspdev-laravel-form-' . $field['name'];
-
-        if ($field['type'] === 'hidden') {
-            return '<input type="hidden" name="' . $field['name'] . '" value="' . ($field['value'] ?? '') . '">' . PHP_EOL;
-        } elseif ($field['type'] === 'textarea') {
-            
-            $html = '<div class="' . $formGroupClass . '">';
-            $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
-            $html .= '<textarea id="' . $fieldId . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . '></textarea>';
-            $html .= '</div>' . PHP_EOL;
-
+        if ($field['type'] === 'textarea') {
+            $html = view('uspdev-forms::partials.textarea', compact('f'))->render();
         } elseif ($field['type'] === 'select') {
-
-            $html = '<div class="' . $formGroupClass . '">';
-            $html .= '<label for="' . $fieldId . '">' . $field['label'] . $requiredLabel . '</label>';
-            $html .= '<select id="' . $fieldId . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required . '>';
-            $html .= '<option selected disabled hidden value="">Selecione um ..</option>';
-            foreach ($field['options'] as $o) {
-                $html .= '<option>' . $o . '</option>';
-            }
-            $html .= '</select>';
-            $html .= '</div>' . PHP_EOL;
-
+            $html = view('uspdev-forms::partials.select', compact('f'))->render();
+        } elseif ($field['type'] === 'pessoa-usp') {
+            $html = view('uspdev-forms::partials.pessoa-usp', compact('f'))->render();
         } else {
-            $value = array_key_exists('value', $field) ? $field['value'] : "";
-            $label = isset($field['label']) ? $field['label'] : "";
-
-            $html = '<div class="' . $formGroupClass . '">';
-            $html .= '<label for="' . $fieldId . '">' . $label  . $requiredLabel . '</label>';
-            $html .= '<input id="' . $fieldId . '" type="' . $field['type'] . '" name="' . $field['name'] . '" class="' . $formControlClass . '" ' . $required .'
-            value="'. $value .'" />';
-            $html .= '</div>' . PHP_EOL;
+            $html = view('uspdev-forms::partials.default', compact('f'))->render();
         }
 
         return $html;
