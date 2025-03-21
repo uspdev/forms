@@ -25,6 +25,11 @@ class Form
     
     /** corresponde ao campo action do formulário */
     public $action;
+    
+    /** Nome do formulario */
+    public $name;
+    
+    public $editable; // bool
 
     public $updateMode;
 
@@ -35,9 +40,11 @@ class Form
         $this->group = config('uspdev-forms.defaultGroup');
         $this->btnLabel = config('uspdev-forms.defaultBtnLabel');
         $this->btnSize = config('uspdev-forms.formSize') == 'small' ? ' btn-sm ' : '';
+        $this->name = isset($config['name']) ? $config['name'] : null;
 
         $this->action = isset($config['action']) ? $config['action'] : null;
         $this->updateMode = isset($config['updateMode']) ? $config['updateMode'] : null;
+        $this->editable = isset($config['editable']) ? $config['editable'] : false;
     }
 
     /**
@@ -138,9 +145,9 @@ class Form
      * @param String $formName ID of form definition
      * @return String HTML formatted
      */
-    public function generateHtml(String $formName, $formSubmission = null)
+    public function generateHtml(String $formName = null, $formSubmission = null)
     {
-        if (!($this->definition = $this->getDefinition($formName))) {
+        if (!($this->definition = $this->getDefinition($formName ?? $this->name))) {
             return null;
         }
 
@@ -223,9 +230,9 @@ class Form
     /**
      * Returns form definition by form_id
      */
-    public function getDefinition($formName)
+    public function getDefinition($formName = null)
     {
-        return FormDefinition::where('name', $formName)->first();
+        return FormDefinition::where('name', $formName ?? $this->name)->first();
     }
 
     /**
