@@ -20,27 +20,27 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
 
-    let attempts = 1;
-    const maxAttempts = 50; // Tenta por 5 segundos (50 * 100ms)
+    let attemptsPessoa = 1;
+    const maxAttemptsPessoa = 50; // Tenta por 5 segundos (50 * 100ms)
 
-    const intervalId = setInterval(() => {
+    const intervalIdPessoa = setInterval(() => {
       if (window.jQuery) {
-        clearInterval(intervalId);
-        console.log("Select carregou após " + attempts + " tentativas.");
-        initSelect2();
-      } else if (attempts >= maxAttempts) {
-        clearInterval(intervalId);
+        clearInterval(intervalIdPessoa);
+        console.log("Select carregou após " + attemptsPessoa + " tentativas.");
+        initSelect2Pessoa();
+      } else if (attemptsPessoa >= maxAttemptsPessoa) {
+        clearInterval(intervalIdPessoa);
         console.error("jQuery não carregou após várias tentativas.");
       }
-      attempts++;
+      attemptsPessoa++;
     }, 100);
 
   });
 
-  function initSelect2() {
-    var $oSelect2 = $('#{{ $f['id'] }}');
+  function initSelect2Pessoa() {
+    var $oSelect2Pessoa = $('#{{ $f['id'] }}');
 
-    $oSelect2.select2({
+    $oSelect2Pessoa.select2({
       ajax: {
         url: '{{ route('SenhaunicaFindUsers') }}',
         dataType: 'json',

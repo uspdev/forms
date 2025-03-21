@@ -189,6 +189,9 @@ class Form
             $html = view('uspdev-forms::partials.checkbox', compact('f','formSubmission'))->render();
         } elseif ($field['type'] === 'pessoa-usp') {
             $html = view('uspdev-forms::partials.pessoa-usp', compact('f','formSubmission'))->render();
+        } elseif ($field['type'] === 'disciplina-usp') {
+            $disciplinas = \Uspdev\Replicado\Graduacao::listarDisciplinas();
+            $html = view('uspdev-forms::partials.disciplina-usp', compact('f','formSubmission', 'disciplinas'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('f','formSubmission'))->render();
         }
