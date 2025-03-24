@@ -2,12 +2,11 @@
 
   <label for="{{ $f['id'] }}">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
 
-  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}" {{ $f['required'] }}>
+  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}" @required($f['required'])>
 
     <option selected disabled hidden value="">Selecione um ..</option>
     @foreach ($f['field']['options'] as $o)
-      <option value="{{ $o }}" 
-        @if (isset($formSubmission) && $formSubmission->data[$f['field']['name']] == $o) selected @endif>
+      <option value="{{ $o }}" @selected($f['old'] == $o)>
         {{ $o }}
       </option>
     @endforeach

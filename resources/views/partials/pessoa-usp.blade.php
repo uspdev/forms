@@ -7,14 +7,14 @@
 
   <label for="{{ $f['id'] }}" class="form-label">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
 
-  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}">
-    @if (isset($formSubmission) && isset($formSubmission->data[$f['field']['name']]))
-      <option value="{{ $formSubmission->data[$f['field']['name']] }}" selected>{{ $formSubmission->data[$f['field']['name']] }}</option>
-    @else
-      <option value="0">Digite o nome ou codpes..</option>
+  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}" @required($f['required'])>
+    <option value="">Digite o nome ou codpes..</option>
+    @if ($f['old'])
+      <option value="{{ $f['old'] }}" selected>
+        {{ $f['old'] }} {{ \Uspdev\Replicado\Pessoa::retornarNome($f['old']) }}
+      </option>
     @endif
   </select>
-
 </div>
 
 <script>
