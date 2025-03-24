@@ -1,7 +1,9 @@
-<form action="{{ $form->action }}" method="{{ $form->method }}" name="{{ $form->definition->name }}">
+<form action="{{ $form->action }}" method="{{ $form->method == 'PUT' ? 'POST' : $form->method }}"
+  name="{{ $form->definition->name }}">
+  @method($form->method)
+  @csrf()
   <input type="hidden" name="form_definition" value="{{ $form->definition->name }}">
   <input type="hidden" name="form_key" value="{{ $form->key }}">
-  @csrf()
 
   {!! $fields !!}
 
