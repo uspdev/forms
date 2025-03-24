@@ -1,15 +1,26 @@
 <div class="{{ $f['formGroupClass'] }}">
 
-  <label for="{{ $f['id'] }}">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
-
+  <div class="form-label">
+    {{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}
+  </div>
+  
   @foreach ($f['field']['options'] as $option)
-    <div class="checkbox" style="display: inline-block; margin-right: 10px;">
-      <input type="checkbox" name="{{ $f['field']['name'] }}[]" value="{{ $option['value'] }}"
-        class="{{ $f['controlClass'] }}" 
-        @if (isset($formSubmission) && in_array($option['value'], $formSubmission->data[$f['field']['name']])) checked @endif
-        {{ $f['required'] }}>
-      {{ $option['label'] }}
+  
+    <div class="form-check form-check-inline">
+      <input 
+        id="{{ $f['id'] }}-{{ $loop->iteration }}"
+        type="checkbox" 
+        name="{{ $f['field']['name'] }}[]" 
+        value="{{ $option['value'] }}"
+        class="form-check-input" 
+        @checked(in_array($option['value'], (array) $f['old']))
+        @required($f['required'])
+      >
+      
+      <label class="form-check-label" for="{{ $f['id'] }}-{{ $loop->iteration }}">
+        {{ $option['label'] }}
+      </label>
     </div>
   @endforeach
-
 </div>
+
