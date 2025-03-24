@@ -12,7 +12,7 @@ class Form
 
     /** Chave definida pelo usuário para esta instancia do form */
     public $key;
-    
+
     public $group;
     public $btnLabel;
     public $btnSize;
@@ -22,28 +22,30 @@ class Form
 
     /** Metodo do form */
     public $method;
-    
+
     /** corresponde ao campo action do formulário */
     public $action;
-    
-    /** Nome do formulario */
+
+    /** Nome do formulario no BD*/
     public $name;
-    
+
+    /** se true, pode ser editado. nesse caso precisa passar o id da submissão */
     public $editable; // bool
 
-    public $updateMode;
 
-    public function __construct($key = null, $config = [],)
+    public function __construct($config = [])
     {
-        $this->key = $key ?: config('uspdev-forms.defaultKey');
-        $this->method = config('uspdev-forms.defaultMethod');
+        $this->key = isset($config['key']) ? $config['key'] : config('uspdev-forms.defaultKey');
+        $this->method = isset($config['method']) ? $config['method'] : config('uspdev-forms.defaultMethod');
+
         $this->group = config('uspdev-forms.defaultGroup');
         $this->btnLabel = config('uspdev-forms.defaultBtnLabel');
         $this->btnSize = config('uspdev-forms.formSize') == 'small' ? ' btn-sm ' : '';
+
+        // nome do form definition
         $this->name = isset($config['name']) ? $config['name'] : null;
 
         $this->action = isset($config['action']) ? $config['action'] : null;
-        $this->updateMode = isset($config['updateMode']) ? $config['updateMode'] : null;
         $this->editable = isset($config['editable']) ? $config['editable'] : false;
     }
 
@@ -56,27 +58,33 @@ class Form
      * @param $request->form_definition
      * @param $request->form_key
      * @param $request->user
+     * @param $request->id (necessário se update for permitido)
      * @return FormSubmission $formSubmission
      */
-    public function handleSubmission(Request $request, $id = null)
+    public function handleSubmission(Request $request)
     {
+        // Retrieve the form definition by id
+        if (!($definition = $this->getDefinition($request->form_definition))) {
+            return response()->json('Error on finding form definition');
+        }
+
         // Lets store only valid form fields
         $data = $this->validate($request);
-        if ($this->updateMode) {
-            $form = FormSubmission::where('id', $id)->firstOrFail();
+        if ($this->editable && $request->id) {
+            $form = FormSubmission::where('id', $request->id)->firstOrFail();
             $form->data = $data;
             $form->save();
 
             return $form;
+        } else {
+            $formSubmission = FormSubmission::Create([
+                'form_definition_id' => $definition->id,
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'key' => $request->form_key,
+                'data' => $data,
+            ]);
+            return $formSubmission;
         }
-        $formSubmission = FormSubmission::Create([
-            'form_definition_id' => $this->definition->id,
-            'user_id' => $request->user() ? $request->user()->id : null,
-            'key' => $request->form_key,
-            'data' => $data,
-        ]);
-
-        return $formSubmission;
     }
 
     /**
@@ -85,12 +93,12 @@ class Form
     public function validate($request)
     {
         // Retrieve the form definition by id
-        if (!($this->definition = $this->getDefinition($request->form_definition))) {
+        if (!($definition = $this->getDefinition($request->form_definition))) {
             return response()->json('Error on finding form definition');
         }
 
         // Validate the incoming request data based on form fields
-        $rules = $this->getValidationRules();
+        $rules = $this->getValidationRules($definition);
         $validator = Validator::make($request->all(), $rules);
 
         // Handle validation failure
@@ -105,24 +113,24 @@ class Form
     /**
      * Retorna as regras de validação para os campos do form
      */
-    protected function getValidationRules()
+    protected static function getValidationRules(FormDefinition $definition)
     {
         $rules = [];
 
-        foreach ($this->definition->fields as $field) {
+        foreach ($definition->fields as $field) {
 
             if (array_is_list($field)) {
                 foreach ($field as $f) {
-                    $rules[$f['name']] = $this->getFieldValidationRule($f);
+                    $rules[$f['name']] = self::getFieldValidationRule($f);
                 }
             } else {
-                $rules[$field['name']] = $this->getFieldValidationRule($field);
+                $rules[$field['name']] = self::getFieldValidationRule($field);
             }
         }
         return $rules;
     }
 
-    protected function getFieldValidationRule($field)
+    protected static function getFieldValidationRule($field)
     {
         // required or nullable
         if (isset($field['required']) && $field['required']) {
@@ -145,9 +153,12 @@ class Form
      * @param String $formName ID of form definition
      * @return String HTML formatted
      */
-    public function generateHtml(String $formName = null, $formSubmission = null)
+    public function generateHtml(?string $formName = null, $formSubmission = null)
     {
-        if (!($this->definition = $this->getDefinition($formName ?? $this->name))) {
+        if (
+            !($this->definition = $this->getDefinition($formName ?? $this->name)) &&
+            !($this->definition = $formSubmission->formDefinition)
+        ) {
             return null;
         }
 
@@ -166,6 +177,9 @@ class Form
                 $fields .= $this->generateField($field, $formSubmission);
             }
         }
+        if ($formSubmission) {
+            $this->btnLabel = 'Atualizar';
+        }
 
         $form = view('uspdev-forms::partials.form', [
             'form' => $this,
@@ -181,26 +195,22 @@ class Form
     protected function generateField($field, $formSubmission)
     {
         $bs = config('uspdev-forms.bootstrapVersion');
-        $required = isset($field['required']) && $field['required'] ? 'required' : '';
+        $required = isset($field['required']) ? $field['required'] : false;
         $requiredLabel = $required ? ' <span class="text-danger">*</span>' : '';
         $formGroupClass = $bs == 5 ? 'mb-3' : 'form-group';
         $controlClass = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
         $id = 'uspdev-forms-' . $field['name'];
         $f = compact('bs', 'required', 'requiredLabel', 'formGroupClass', 'controlClass', 'id', 'field');
 
-        if ($field['type'] === 'textarea') {
-            $html = view('uspdev-forms::partials.textarea', compact('f','formSubmission'))->render();
-        } elseif ($field['type'] === 'select') {
-            $html = view('uspdev-forms::partials.select', compact('f','formSubmission'))->render();
-        } elseif ($field['type'] === 'checkbox') {
-            $html = view('uspdev-forms::partials.checkbox', compact('f','formSubmission'))->render();
-        } elseif ($field['type'] === 'pessoa-usp') {
-            $html = view('uspdev-forms::partials.pessoa-usp', compact('f','formSubmission'))->render();
-        } elseif ($field['type'] === 'disciplina-usp') {
-            $disciplinas = \Uspdev\Replicado\Graduacao::listarDisciplinas();
-            $html = view('uspdev-forms::partials.disciplina-usp', compact('f','formSubmission', 'disciplinas'))->render();
+        $f['old'] = null;
+        if (isset($formSubmission->data[$field['name']])) {
+            $f['old'] = $formSubmission->data[$field['name']];
+        }
+
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'pessoa-usp'])) {
+            $html = view('uspdev-forms::partials.' . $field['type'], compact('f'))->render();
         } else {
-            $html = view('uspdev-forms::partials.default', compact('f','formSubmission'))->render();
+            $html = view('uspdev-forms::partials.default', compact('f'))->render();
         }
 
         return $html;
@@ -228,7 +238,7 @@ class Form
     }
 
     /**
-     * Returns form definition by form_id
+     * Returns form definition by form name
      */
     public function getDefinition($formName = null)
     {

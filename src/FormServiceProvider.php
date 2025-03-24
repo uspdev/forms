@@ -1,7 +1,9 @@
 <?php
+
 namespace Uspdev\Forms;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class FormServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,11 @@ class FormServiceProvider extends ServiceProvider
         // Load migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'uspdev-forms');
+
+        // Registra a diretiva
+        Blade::directive('submissionsTable', function ($form) {
+            return "<?php echo view('uspdev-forms::partials.submissions-table', ['form' => $form])->render(); ?>";
+        });
     }
 
     /**
@@ -35,7 +42,8 @@ class FormServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/uspdev-forms.php', 'uspdev-forms'
+            __DIR__ . '/../config/uspdev-forms.php',
+            'uspdev-forms'
         );
     }
 }

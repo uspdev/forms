@@ -23,11 +23,28 @@ class FormDefinition extends Model
     }
 
     /**
+     * Retorna fields mas achatado - sem subarrays
+     */
+    public function flattenFields()
+    {
+        $ret = [];
+        foreach ($this->fields as $field) {
+            if (array_is_list($field)) {
+                foreach ($field as $f) {
+                    $ret[] = $f;
+                }
+            } else {
+                $ret[] = $field;
+            }
+        }
+        return $ret;
+    }
+
+    /**
      * Get the the submissions for the form definition
      */
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
     }
-
 }
