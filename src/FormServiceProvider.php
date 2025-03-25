@@ -28,6 +28,9 @@ class FormServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'uspdev-forms');
 
+        // Load routes
+        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
+
         // Registra a diretiva
         Blade::directive('submissionsTable', function ($form) {
             return "<?php echo view('uspdev-forms::partials.submissions-table', ['form' => $form])->render(); ?>";
