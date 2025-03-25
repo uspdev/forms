@@ -1,23 +1,23 @@
-<div class="{{ $f['formGroupClass'] }}">
+<div class="{{ $field['formGroupClass'] }}">
 
   <div class="form-label">
-    {{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}
+    {{ $field['label'] }} {!! $field['requiredLabel'] !!}
   </div>
   
-  @foreach ($f['field']['options'] as $option)
+  @foreach ($field['options'] as $option)
   
     <div class="form-check form-check-inline">
       <input 
-        id="{{ $f['id'] }}-{{ $loop->iteration }}"
+        id="{{ $field['id'] }}-{{ $loop->iteration }}"
         type="checkbox" 
-        name="{{ $f['field']['name'] }}[]" 
+        name="{{ $field['name'] }}[]" 
         value="{{ $option['value'] }}"
         class="form-check-input" 
-        @checked(in_array($option['value'], (array) $f['old']))
-        @required($f['required'])
+        @checked(in_array($option['value'], (array) $field['old']))
+        @required($field['required'])
       >
       
-      <label class="form-check-label" for="{{ $f['id'] }}-{{ $loop->iteration }}">
+      <label class="form-check-label" for="{{ $field['id'] }}-{{ $loop->iteration }}">
         {{ $option['label'] }}
       </label>
     </div>
