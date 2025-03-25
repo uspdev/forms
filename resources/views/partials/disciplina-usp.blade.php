@@ -1,17 +1,17 @@
-<div class="{{ $f['formGroupClass'] }}" id="uspdev-forms-disciplina-usp">
+<div class="{{ $field['formGroupClass'] }}" id="uspdev-forms-disciplina-usp">
 
-  <label for="{{ $f['id'] }}" class="form-label">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
+  <label for="{{ $field['id'] }}" class="form-label">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
-  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}">
-    <option value="">Selecione uma disciplina..</option>
-    @foreach ($disciplinas as $disciplina)
-      <option value="{{ $disciplina['coddis'] }}" 
-        @if (isset($formSubmission) && $formSubmission->data[$f['field']['name']] == $disciplina['coddis']) 
-          selected 
-        @endif>
-        {{ $disciplina['nomdis'] }}
+  <select id="{{ $field['id'] }}" name="{{ $field['name'] }}" class="{{ $field['controlClass'] }}">
+    <option value="">Selecione uma disciplina...</option>
+     @if (isset($formSubmission) && isset($formSubmission->data[$field['name']]))
+      <option value="{{ $formSubmission->data[$field['name']] }}" selected>{{ $formSubmission->data[$field['name']] }} 
+      {{ \Uspdev\Replicado\Graduacao::nomeDisciplina($formSubmission->data[$field['name']]) }}</option>
+    @elseif ($field['old'])
+      <option value="{{ $field['old'] }}" selected>
+        {{ $field['old'] }} {{ \Uspdev\Replicado\Graduacao::nomeDisciplina($field['old']) }}
       </option>
-    @endforeach
+    @endif
   </select>
 
 </div>
@@ -37,12 +37,18 @@
   });
 
   function initSelect2Disc() {
-    var $oSelect2Disc = $('#{{ $f['id'] }}');
+    var $oSelect2Disc = $('#{{ $field['id'] }}');
 
     $oSelect2Disc.select2({
+      ajax: {
+        url: '{{ route('DisciplinaFind') }}',
+        dataType: 'json',
+        delay: 1000
+      },
+      minimumInputLength: 5,
       theme: 'bootstrap4',
       width: 'resolve',
-      language: 'pt-BR' 
+      language: 'pt-BR'
     });
 
     // Coloca o foco no campo de busca ao abrir o Select2

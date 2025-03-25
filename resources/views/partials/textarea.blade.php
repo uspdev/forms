@@ -1,11 +1,11 @@
-<div class="{{ $f['formGroupClass'] }}">
+<div class="{{ $field['formGroupClass'] }}">
 
-  <label for="{{ $f['id'] }}">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
+  <label for="{{ $field['id'] }}">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
-  <textarea id="{{ $f['id'] }}" 
-    name="{{ $f['field']['name'] }}" 
-    class="{{ $f['controlClass'] }}" 
-    @required($f['required'])
-    >{{ $f['old'] }}</textarea>
+  <textarea id="{{ $field['id'] }}" 
+    name="{{ $field['name'] }}" 
+    class="{{ $field['controlClass'] }}" 
+    @required($field['required'])
+    >{{ $field['old'] }}</textarea>
 
 </div>

@@ -1,12 +1,12 @@
-<div class="{{ $f['formGroupClass'] }}">
+<div class="{{ $field['formGroupClass'] }}">
 
-  <label for="{{ $f['id'] }}">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
+  <label for="{{ $field['id'] }}">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
-  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}" @required($f['required'])>
+  <select id="{{ $field['id'] }}" name="{{ $field['name'] }}" class="{{ $field['controlClass'] }}" @required($field['required'])>
 
     <option selected disabled hidden value="">Selecione um ..</option>
-    @foreach ($f['field']['options'] as $o)
-      <option value="{{ $o }}" @selected($f['old'] == $o)>
+    @foreach ($field['options'] as $o)
+      <option value="{{ $o }}" @selected($field['old'] == $o)>
         {{ $o }}
       </option>
     @endforeach

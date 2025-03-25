@@ -194,23 +194,22 @@ class Form
      */
     protected function generateField($field, $formSubmission)
     {
-        $bs = config('uspdev-forms.bootstrapVersion');
-        $required = isset($field['required']) ? $field['required'] : false;
-        $requiredLabel = $required ? ' <span class="text-danger">*</span>' : '';
-        $formGroupClass = $bs == 5 ? 'mb-3' : 'form-group';
-        $controlClass = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
-        $id = 'uspdev-forms-' . $field['name'];
-        $f = compact('bs', 'required', 'requiredLabel', 'formGroupClass', 'controlClass', 'id', 'field');
+        $field['bs'] = config('uspdev-forms.bootstrapVersion');
+        $field['required'] = isset($field['required']) ? $field['required'] : false;
+        $field['requiredLabel'] = $field['required'] ? ' <span class="text-danger">*</span>' : '';
+        $field['formGroupClass'] = $field['bs'] == 5 ? 'mb-3' : 'form-group';
+        $field['controlClass'] = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
+        $field['id'] = 'uspdev-forms-' . $field['name'];
 
-        $f['old'] = null;
+        $field['old'] = null;
         if (isset($formSubmission->data[$field['name']])) {
-            $f['old'] = $formSubmission->data[$field['name']];
+            $field['old'] = $formSubmission->data[$field['name']];
         }
 
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'pessoa-usp'])) {
-            $html = view('uspdev-forms::partials.' . $field['type'], compact('f'))->render();
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden', 'pessoa-usp', 'disciplina-usp'])) {
+            $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
-            $html = view('uspdev-forms::partials.default', compact('f'))->render();
+            $html = view('uspdev-forms::partials.default', compact('field'))->render();
         }
 
         return $html;

@@ -3,17 +3,21 @@
   Masakik, em 20/3/2025 
 --}}
 
-<div class="{{ $f['formGroupClass'] }}" id="uspdev-forms-pessoa-usp">
+<div class="{{ $field['formGroupClass'] }}" id="uspdev-forms-pessoa-usp">
 
-  <label for="{{ $f['id'] }}" class="form-label">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
+  <label for="{{ $field['id'] }}" class="form-label">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
-  <select id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}" @required($f['required'])>
+  <select id="{{ $field['id'] }}" name="{{ $field['name'] }}" class="{{ $field['controlClass'] }}" @required($field['required'])>
     <option value="">Digite o nome ou codpes..</option>
-    @if ($f['old'])
-      <option value="{{ $f['old'] }}" selected>
-        {{ $f['old'] }} {{ \Uspdev\Replicado\Pessoa::retornarNome($f['old']) }}
+    @if (isset($formSubmission) && isset($formSubmission->data[$field['name']]))
+      <option value="{{ $formSubmission->data[$field['name']] }}" selected>{{ $formSubmission->data[$field['name']] }} 
+      {{ \Uspdev\Replicado\Pessoa::retornarNome($formSubmission->data[$field['name']]) }}</option>
+    @elseif ($field['old'])
+      <option value="{{ $field['old'] }}" selected>
+        {{ $field['old'] }} {{ \Uspdev\Replicado\Pessoa::retornarNome($field['old']) }}
       </option>
     @endif
+    
   </select>
 </div>
 
@@ -38,7 +42,7 @@
   });
 
   function initSelect2Pessoa() {
-    var $oSelect2Pessoa = $('#{{ $f['id'] }}');
+    var $oSelect2Pessoa = $('#{{ $field['id'] }}');
 
     $oSelect2Pessoa.select2({
       ajax: {

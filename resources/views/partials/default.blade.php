@@ -1,8 +1,8 @@
-<div class="{{ $f['formGroupClass'] }}">
+<div class="{{ $field['formGroupClass'] }}">
   
-  <label for="{{ $f['id'] }}">{{ $f['field']['label'] }} {!! $f['requiredLabel'] !!}</label>
+  <label for="{{ $field['id'] }}">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
-  <input id="{{ $f['id'] }}" name="{{ $f['field']['name'] }}" class="{{ $f['controlClass'] }}"
-    value="{{ $f['old'] }}" @required($f['required'])>
+  <input id="{{ $field['id'] }}" name="{{ $field['name'] }}" class="{{ $field['controlClass'] }}"
+    value="{{ $field['old'] }}" @required($field['required'])>
     
 </div>
