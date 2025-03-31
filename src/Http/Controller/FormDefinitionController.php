@@ -7,7 +7,7 @@ use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Forms\Models\FormDefinition;
 
-class FormController extends Controller
+class FormDefinitionController extends Controller
 {
     public function create()
     {
