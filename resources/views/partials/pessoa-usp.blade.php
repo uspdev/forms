@@ -46,7 +46,7 @@
 
     $oSelect2Pessoa.select2({
       ajax: {
-        url: '{{ route('SenhaunicaFindUsers') }}',
+        url: '{{ route('form.user.find') }}',
         dataType: 'json',
         delay: 1000
       },

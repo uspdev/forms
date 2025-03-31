@@ -41,7 +41,7 @@
 
     $oSelect2Disc.select2({
       ajax: {
-        url: '{{ route('DisciplinaFind') }}',
+        url: '{{ route('form.disciplina.find') }}',
         dataType: 'json',
         delay: 1000
       },

@@ -8,4 +8,7 @@ return [
     'defaultMethod'=> 'POST',
     'defaultGroup'=> 'default-form-group',
     'defaultBtnLabel' => 'Enviar',
+    'prefix' => 'uspdev-forms',
+    'findUsersGate' => 'user',
+    'findDisciplinasGate' => 'user'
 ];
