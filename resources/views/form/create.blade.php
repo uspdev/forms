@@ -71,6 +71,17 @@ Uso:
           $('.autoexpand').trigger('change')
         }, 500)
 
+        $('#form-definition-form').on('submit', function(e) {
+          const jsonText = $('#fields').val()
+
+          try {
+            JSON.parse(jsonText)
+          } catch (error) {
+            e.preventDefault();
+            alert('O JSON precisa ser válido!')
+          }
+        })
+
       })
     </script>
   @endsection

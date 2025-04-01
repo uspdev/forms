@@ -130,6 +130,9 @@ class Form
         return $rules;
     }
 
+    /**
+     * Return the validation rule for a field based on required or type
+     */
     protected static function getFieldValidationRule($field)
     {
         // required or nullable
@@ -228,9 +231,12 @@ class Form
         return FormSubmission::where($cond)->get();
     }
 
-    public function whereSubmissionContains($campo, $string)
+    /**
+     * List form submissions filtering by the value of a given field
+     */
+    public function whereSubmissionContains($field, $string)
     {
-        return FormSubmission::whereJsonContains('data->'.$campo, $string)->get();
+        return FormSubmission::whereJsonContains('data->'.$field, $string)->get();
     }
 
     /**
