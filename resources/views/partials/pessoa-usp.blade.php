@@ -16,6 +16,9 @@
       <option value="{{ $field['old'] }}" selected>
         {{ $field['old'] }} {{ \Uspdev\Replicado\Pessoa::retornarNome($field['old']) }}
       </option>
+    @elseif(\Illuminate\Support\Facades\Auth::user())
+      <option value="{{ \Illuminate\Support\Facades\Auth::user()->codpes }}" selected>{{ \Illuminate\Support\Facades\Auth::user()->codpes }} 
+      {{ \Uspdev\Replicado\Pessoa::retornarNome(\Illuminate\Support\Facades\Auth::user()->codpes) }}</option>
     @endif
     
   </select>
