@@ -3,7 +3,7 @@
 namespace Uspdev\Forms\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Uspdev\Replicado\Graduacao;
+use Uspdev\Forms\Graduacao;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Forms\Models\FormDefinition;
 
@@ -25,7 +25,7 @@ class FormDefinitionController extends Controller
 
         FormDefinition::create($request->all());
 
-        return redirect()->route('form-definitions.index')->with('success', 'Form Definition created successfully.');
+        return redirect()->route('form-definitions.index')->with('alert-success', 'Form Definition created successfully.');
     }
 
     public function edit($id)
@@ -84,7 +84,7 @@ class FormDefinitionController extends Controller
         if (hasReplicado()) {
             $coddis = \Illuminate\Support\Str::upper($request->term);
             
-            $disciplinas = Graduacao::obterDisciplinas([$coddis]);
+            $disciplinas = Graduacao::procurarDisciplinas([$coddis]);
 
             foreach ($disciplinas as $disciplina) {
                 $results[] = [
