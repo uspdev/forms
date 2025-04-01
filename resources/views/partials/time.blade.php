@@ -1,4 +1,4 @@
-<div class="{{ $field['formGroupClass'] }}">
+<div class="{{ $field['formGroupClass'] }} d-inline-block">
   
   <label for="{{ $field['id'] }}">{{ $field['label'] }} {!! $field['requiredLabel'] !!}</label>
 
