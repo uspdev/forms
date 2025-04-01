@@ -6,6 +6,6 @@
     name="{{ $field['name'] }}" 
     class="{{ $field['controlClass'] }}" 
     @required($field['required'])
-    >{{ $field['old'] }}</textarea>
+    >{{  $field['value'] ?? $field['old'] }}</textarea>
 
 </div>
