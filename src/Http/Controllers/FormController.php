@@ -5,68 +5,9 @@ namespace Uspdev\Forms\Http\Controllers;
 use Illuminate\Http\Request;
 use Uspdev\Forms\Graduacao;
 use Uspdev\Replicado\Pessoa;
-use Uspdev\Forms\Models\FormDefinition;
 
-class FormDefinitionController extends Controller
+class FormController extends Controller
 {
-    public function create()
-    {
-        return view('uspdev-forms::form.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'group' => 'required|string|max:255',
-            'description' => 'required|string',
-            'fields' => 'required|string',
-        ]);
-
-        FormDefinition::create($request->all());
-
-        return redirect()->route('form-definitions.index')->with('alert-success', 'Form Definition created successfully.');
-    }
-
-    public function edit($id)
-    {
-        $formDefinition = FormDefinition::findOrFail($id);
-        return view('uspdev-forms::form.create', compact('formDefinition'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'group' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'fields' => 'required|string'
-        ]);
-        
-
-        $formDefinition = FormDefinition::findOrFail($id);
-
-        $formDefinition->fields = json_decode($request->input('fields'), true);
-        $formDefinition->save();
-
-        $formDefinition->update($request->only(['name', 'group', 'description']));
-
-        return redirect()->route('form-definitions.index');
-    }
-
-    public function destroy($id)
-    {
-        $formDefinition = FormDefinition::findOrFail($id);
-        $formDefinition->delete();
-
-        return redirect()->route('form-definitions.index');
-    }
-
-    public function index()
-    {
-        $formDefinitions = FormDefinition::all();
-        return view('uspdev-forms::form.index', compact('formDefinitions'));
-    }
 
     /**
      * Busca para ajax do select2 de disciplinas
@@ -95,7 +36,6 @@ class FormDefinitionController extends Controller
             $results = array_slice($results, 0, 50);
   
         }
-
 
         return response()->json(['results' => $results]);
     }
