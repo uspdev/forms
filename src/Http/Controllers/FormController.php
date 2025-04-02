@@ -4,10 +4,51 @@ namespace Uspdev\Forms\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Uspdev\Forms\Graduacao;
+use Uspdev\Forms\Form;
+use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Replicado\Pessoa;
 
 class FormController extends Controller
 {
+    public static function allSubmissions($formDefinitionId)
+    {
+        $form = FormDefinition::find($formDefinitionId);
+        $form->editable = true;
+
+        return view('uspdev-forms::form.listAll', compact('form'));
+    }
+
+    public static function getSubmission($id)
+    {
+        $form = new Form();
+        $submission = $form->getSubmission($id);
+        
+        return view('uspdev-forms::form.showSubmission', compact('submission'));
+    }
+
+    public static function editSubmission($formDefinitionId, $formSubmissionId){
+        $form = new Form();
+        $submission = $form->getSubmission($formSubmissionId);
+        $definition = FormDefinition::find($formDefinitionId);
+        $formHtml = $form->generateHtml($definition->name, $submission);
+        return view('uspdev-forms::form.showSubmission', compact('formHtml', 'submission', 'definition'));
+    }
+
+    public static function updateSubmission(Request $request, $formDefinitionId, $formSubmissionId){
+        $config['editable'] = true;
+        $form = new Form($config);
+        $request->id = $formSubmissionId;
+        $form->handleSubmission($request);
+
+        return redirect(route('form.submissions.all', ['formDefinitionId' => $formDefinitionId]));
+    }
+
+    public static function deleteSubmission($formDefinitionId, $formSubmissionId){
+        $form = new Form();
+        $submission = $form->getSubmission($formSubmissionId);
+        $submission->delete();
+        return redirect(route('form.submissions.all', ['formDefinitionId' => $formDefinitionId]));
+    }
 
     /**
      * Busca para ajax do select2 de disciplinas

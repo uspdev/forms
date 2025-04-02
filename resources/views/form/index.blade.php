@@ -16,7 +16,7 @@
       <tbody>
         @foreach ($formDefinitions as $formDefinition)
           <tr>
-            <td>{{ $formDefinition->name }}</td>
+            <td><a href="{{ route('form.submissions.all', ['formDefinitionId' => $formDefinition->id]) }}">{{ $formDefinition->name }}</a></td>
             <td>{{ $formDefinition->description }}</td>
             <td>
               <a href="{{ route('form-definitions.edit', $formDefinition->id) }}" class="btn btn-warning btn-sm">Editar</a>

@@ -3,8 +3,6 @@
 namespace Uspdev\Forms\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Uspdev\Forms\Graduacao;
-use Uspdev\Replicado\Pessoa;
 use Uspdev\Forms\Models\FormDefinition;
 
 class FormDefinitionController extends Controller
