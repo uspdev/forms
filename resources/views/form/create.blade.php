@@ -37,6 +37,9 @@
       </div>
 
       <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+      <a href="{{ route('form-definitions.index') }}" class="btn btn-secondary btn-sm mr-2 mt-3 pb-2">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
     </form>
   </div>
 @endsection
