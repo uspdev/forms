@@ -110,6 +110,24 @@ public function store(Request $request)
   // ....
 }
 ```
+
+4. **List submissions**
+Get all the submissions in general or for a specific form:
+
+```php
+$allSubmissions = $form->listSubmission();
+
+// Or
+
+$allFormNameSubmissions = $form->listSubmission('form-name');
+```
+
+4. **Get submission**
+Get a specific submission by its id:
+
+```php
+$formSubmission = $form->getSubmission($formSubmissionId);
+```
     
 ## Contributing
 
