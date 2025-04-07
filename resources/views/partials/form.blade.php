@@ -1,5 +1,5 @@
 <form action="{{ $form->action }}" method="{{ $form->method == 'PUT' ? 'POST' : $form->method }}"
-  name="{{ $form->definition->name }}">
+  name="{{ $form->definition->name }}" id="generatedForm">
   @method($form->method)
   @csrf()
   <input type="hidden" name="form_definition" value="{{ $form->definition->name }}">
