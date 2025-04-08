@@ -15,7 +15,7 @@
         class="form-check-input" 
         @checked(in_array($option['value'], (array) $field['old']))
       >
-      <label class="form-check-label" for="{{ $field['id'] }}-{{ $loop->iteration }}">
+      <label class="form-check-label mr-3" for="{{ $field['id'] }}-{{ $loop->iteration }}">
         {{ $option['label'] }}
       </label>
     @endforeach

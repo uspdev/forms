@@ -7,13 +7,22 @@ use Uspdev\Forms\Graduacao;
 use Uspdev\Forms\Form;
 use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Replicado\Pessoa;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class FormController extends Controller
 {
     public static function allSubmissions($formDefinitionId)
     {
         $form = FormDefinition::find($formDefinitionId);
-        $form->editable = true;
+
+        $config = [
+            'editable' => true,
+            'name' => $form->name
+        ];
+        $form = new Form($config);
+        $form->user = Auth::user();
+        $form->admin = Gate::allows('manager', Auth::user()) ? true : false;
 
         return view('uspdev-forms::form.listAll', compact('form'));
     }

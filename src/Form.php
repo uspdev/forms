@@ -31,7 +31,10 @@ class Form
 
     /** se true, pode ser editado. nesse caso precisa passar o id da submissão */
     public $editable; // bool
-
+    
+    public $user;
+    
+    public $admin;
 
     public function __construct($config = [])
     {
@@ -236,7 +239,9 @@ class Form
      */
     public function whereSubmissionContains($field, $string)
     {
-        return FormSubmission::whereJsonContains('data->'.$field, $string)->get();
+        return $this->admin == true 
+            ? FormSubmission::all()
+            : FormSubmission::whereJsonContains('data->' . $field, (string) $string)->get();
     }
 
     /**

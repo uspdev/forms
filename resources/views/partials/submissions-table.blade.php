@@ -8,7 +8,7 @@
   <thead>
     <tr>
       @foreach ($form->getDefinition()->flattenFields() as $field)
-        <th>{{ $field['label'] }}</th>
+        <th>{{ $field['label']  ?? $field['name']}}</th>
       @endforeach
       @if ($form->editable)
         <th></th>
