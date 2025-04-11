@@ -41,7 +41,9 @@ class Graduacao extends GraduacaoReplicado
             $query .= "LIMIT $limit";
         }
 
-        $query .= " ORDER BY D1.coddis ASC";
+        $query .= "AND D1.dtadtvdis IS NULL 
+                   AND D1.dtaatvdis IS NOT NULL
+                   ORDER BY D1.coddis ASC";
 
         return DB::fetchAll($query);
     }
