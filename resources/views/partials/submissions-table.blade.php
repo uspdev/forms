@@ -4,7 +4,7 @@
   @submissionTable($form)
   
  --}}
-<table class="table table-striped table-bordered datatable-simples">
+<table class="table table-striped table-bordered datatable-simples w-100" style="table-layout: fixed; width: 100%;">
   <thead>
     <tr>
       @foreach ($form->getDefinition()->flattenFields() as $field)
@@ -19,7 +19,7 @@
     @forelse ($form->listSubmission() as $submission)
       <tr>
         @foreach ($form->getDefinition()->flattenFields() as $field)
-          <td>
+          <td style="overflow: hidden; text-overflow: ellipsis; ">
             @if ($field['type'] == 'pessoa-usp')
               {{ $submission['data'][$field['name']] }}
               {{ \Uspdev\Replicado\Pessoa::retornarNome($submission['data'][$field['name']]) ?? $submission['data'][$field['name']] }}
