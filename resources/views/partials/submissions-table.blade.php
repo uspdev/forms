@@ -16,7 +16,7 @@
     </tr>
   </thead>
   <tbody>
-    @forelse ($form->listSubmission() as $submission)
+    @forelse ($form->listSubmission($form->name) as $submission)
       <tr>
         @foreach ($form->getDefinition()->flattenFields() as $field)
           <td style="overflow: hidden; text-overflow: ellipsis; ">

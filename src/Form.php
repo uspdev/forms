@@ -223,10 +223,16 @@ class Form
 
     /**
      * List form submissions filtering by key and optionally by formName
+     * 
+     * If there's no specific key, it lists all submissions
      */
     public function listSubmission($formName = null)
     {
-        $cond['key'] = $this->key;
+        $cond = [];
+        if($this->key != config('uspdev-forms.defaultKey')){
+            $cond['key'] = $this->key;
+        }
+
         if ($formName) {
             $cond['form_definition_id'] = $this->getDefinition($formName)->id;
         }
