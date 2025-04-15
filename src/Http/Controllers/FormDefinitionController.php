@@ -29,11 +29,18 @@ class FormDefinitionController extends Controller
             'name' => 'required|string|max:255',
             'group' => 'required|string|max:255',
             'description' => 'required|string',
-            'fields' => 'required|string',
+            'fields' => 'required|json',
         ]);
 
-        FormDefinition::create($request->all());
+        $fields = json_decode($request->input('fields'), true);
 
+        FormDefinition::create([
+            'name' => $request->input('name'),
+            'group' => $request->input('group'),
+            'description' => $request->input('description'),
+            'fields' => $fields,
+        ]);
+        
         return redirect()->route('form-definitions.index')->with('alert-success', 'Form Definition created successfully.');
     }
 
