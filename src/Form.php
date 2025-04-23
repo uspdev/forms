@@ -212,7 +212,7 @@ class Form
             $field['old'] = $formSubmission->data[$field['name']];
         }
 
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden','time', 'pessoa-usp', 'disciplina-usp'])) {
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden','time','date', 'pessoa-usp', 'disciplina-usp'])) {
             $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('field'))->render();
