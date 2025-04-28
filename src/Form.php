@@ -295,7 +295,7 @@ class Form
         $mockSubmission = $submission;
         if($submission->delete()){
             activity()->performedOn($mockSubmission)->causedBy($user)->log('Chave excluída');
-            return true;
+            return $mockSubmission;
         } return false;
     }
 
