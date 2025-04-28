@@ -46,16 +46,15 @@ class FormController extends Controller
     public static function updateSubmission(Request $request, $formDefinitionId, $formSubmissionId){
         $config['editable'] = true;
         $form = new Form($config);
-        $request->id = $formSubmissionId;
-        $form->handleSubmission($request);
+        $form->updateSubmission($request, $formSubmissionId, Auth::user());
 
         return redirect(route('form.submissions.all', ['formDefinitionId' => $formDefinitionId]));
     }
 
     public static function deleteSubmission($formDefinitionId, $formSubmissionId){
         $form = new Form();
-        $submission = $form->getSubmission($formSubmissionId);
-        $submission->delete();
+        $form->deleteSubmission($formSubmissionId, Auth::user());
+
         return redirect(route('form.submissions.all', ['formDefinitionId' => $formDefinitionId]));
     }
 

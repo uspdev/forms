@@ -4,6 +4,7 @@ namespace Uspdev\Forms;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use \Spatie\Activitylog\Models\Activity;
 
 class FormServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,13 @@ class FormServiceProvider extends ServiceProvider
         // Registra a diretiva
         Blade::directive('submissionsTable', function ($form) {
             return "<?php echo view('uspdev-forms::partials.submissions-table', ['form' => $form])->render(); ?>";
+        });
+
+        // https://github.com/spatie/laravel-activitylog/issues/39
+        Activity::saving(function (Activity $activity) {
+            $activity->properties = $activity->properties->put('agent', [
+                'ip' => Request()->ip()
+            ]);
         });
     }
 

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Forms\Models\FormSubmission;
+use Illuminate\Support\Facades\Auth;
+use \Spatie\Activitylog\Models\Activity;
 
 class Form
 {
@@ -86,6 +88,8 @@ class Form
                 'key' => $request->form_key,
                 'data' => $data,
             ]);
+
+            activity()->performedOn($formSubmission)->causedBy(Auth::user())->log('Submissão criada');
             return $formSubmission;
         }
     }
@@ -256,6 +260,43 @@ class Form
     public function getSubmission($id)
     {
         return FormSubmission::find($id);
+    }
+
+    /**
+     * Get a form submission activities by id
+     */
+    public function getSubmissionActivities($id)
+    {
+        return Activity::orderBy('created_at', 'DESC')->where('subject_id', $id)->take(20)->get();
+    }
+
+    /**
+     * Updates a form submission and registers the activity
+     */
+    public function updateSubmission(Request $request, $formSubmissionId, $user){
+        if($this->editable){
+            $request->id = $formSubmissionId;
+            $formSubmission = $this->handleSubmission($request);
+
+            activity()->performedOn($formSubmission)->causedBy($user)->log('Submissão atualizada');
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Deletes a form submission and registers the activity
+     */
+    public function deleteSubmission($id, $user)
+    {
+        $submission = $this->getSubmission($id);
+
+        $mockSubmission = $submission;
+        if($submission->delete()){
+            activity()->performedOn($mockSubmission)->causedBy($user)->log('Chave excluída');
+            return true;
+        } return false;
     }
 
     /**
