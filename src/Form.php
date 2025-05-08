@@ -280,7 +280,7 @@ class Form
 
             activity()->performedOn($formSubmission)->causedBy($user)->log('Submissão atualizada');
 
-            return true;
+            return $formSubmission;
         }
         return false;
     }
