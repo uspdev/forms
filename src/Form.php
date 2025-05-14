@@ -89,6 +89,29 @@ class Form
                 'data' => $data,
             ]);
 
+            if($request->hasFile('file')){
+                foreach ($request->file('file') as $fieldName => $file) {
+                    $fileHash = md5_file($file->path());
+                    $originalName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) 
+                            . '.' . $file->getClientOriginalExtension();
+                    $storedName = 'id' . $formSubmission->id . '-' . $fileHash . '.' . $file->getClientOriginalExtension();
+
+                    $path = $file->storeAs(
+                        'formsubmissions/' . date('Y/m'),
+                        $storedName,
+                        'public'
+                    );
+                    
+                    $data[$fieldName] = [
+                        'original_name' => $originalName,
+                        'stored_path' => $path,
+                        'content_hash' => $fileHash
+                    ];
+                    $formSubmission->data = $data;
+                    $formSubmission->save();
+                }
+            }
+
             activity()->performedOn($formSubmission)->causedBy(Auth::user())->log('Submissão criada');
             return $formSubmission;
         }
@@ -216,7 +239,7 @@ class Form
             $field['old'] = $formSubmission->data[$field['name']];
         }
 
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden','time','date', 'pessoa-usp', 'disciplina-usp'])) {
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden','time','date', 'pessoa-usp', 'disciplina-usp', 'file'])) {
             $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('field'))->render();
