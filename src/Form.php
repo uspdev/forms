@@ -112,7 +112,6 @@ class Form
                 }
             }
 
-            activity()->performedOn($formSubmission)->causedBy(Auth::user())->log('Submissão criada');
             return $formSubmission;
         }
     }
@@ -300,8 +299,6 @@ class Form
         if($this->editable){
             $request->id = $formSubmissionId;
             $formSubmission = $this->handleSubmission($request);
-
-            activity()->performedOn($formSubmission)->causedBy($user)->log('Submissão atualizada');
 
             return $formSubmission;
         }

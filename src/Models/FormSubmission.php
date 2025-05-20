@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Uspdev\Forms\Models\FormDefinition;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class FormSubmission extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $guarded = ['id'];
 
@@ -40,6 +43,21 @@ class FormSubmission extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['data'])
+        ->setDescriptionForEvent(function(string $eventName) {
+            $eventos = [
+                'created' => 'criada',
+                'updated' => 'atualizada',
+                'deleted' => 'excluída',
+            ];
+            $eventoPt = $eventos[$eventName] ?? $eventName;
+            return "Submissão {$eventoPt}";
+        });
     }
 
 }
