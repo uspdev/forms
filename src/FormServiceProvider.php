@@ -5,6 +5,7 @@ namespace Uspdev\Forms;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use \Spatie\Activitylog\Models\Activity;
+use Uspdev\Forms\Providers\EventServiceProvider;
 
 class FormServiceProvider extends ServiceProvider
 {
@@ -15,6 +16,8 @@ class FormServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->app->register(EventServiceProvider::class);
+
         // Publish config file
         $this->publishes([
             __DIR__ . '/../config/uspdev-forms.php' => config_path('uspdev-forms.php'),
