@@ -31,6 +31,17 @@ After publishing, run the migrations to create the necessary tables:
 
     php artisan migrate
 
+### Menu na aplicação
+
+No config/laravel-usp-theme.php, coloque ou reposicione a chave uspdev-forms para mostrar o menu. Ele será visível somente para admin.
+
+```
+[
+    'key' => 'uspdev-forms',
+],
+
+```
+
 ## Configuration
 
 You can customize the package's settings by modifying the config/forms.php file. Here, you can set the default Bootstrap version.
