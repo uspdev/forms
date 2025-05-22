@@ -335,4 +335,9 @@ class Form
         $where[] = $formGroup ? ['group', $formGroup] : ['group', $this->group];
         return FormDefinition::where($where)->get();
     }
+
+    public function detailActivity($id)
+    {
+        return Activity::findOrFail($id);
+    }
 }
