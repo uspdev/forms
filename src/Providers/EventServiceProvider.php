@@ -15,20 +15,19 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        parent::boot();
+        // parent::boot();
 
-        if (config('uspdev-forms.prefix')) {
-            Event::listen(function (UspThemeParseKey $event) {
-                if (isset($event->item['key']) && $event->item['key'] == 'uspdev-forms') {
-                    $event->item = [
-                        'text' => '<span class="text-danger">Formulários</span>',
-                        'url' => config('uspdev-forms.prefix') . '/form-definitions',
-                        'title' => 'Formulários',
-                        'can' => 'admin',
-                    ];
-                }
-                return $event->item;
-            });
-        }
+        // Adiciona o item "Formulários" no menu se a chave uspdev-forms estiver disponível
+        Event::listen(function (UspThemeParseKey $event) {
+            if (isset($event->item['key']) && $event->item['key'] == 'uspdev-forms') {
+                $event->item = [
+                    'text' => '<span class="text-danger"><i class="fas fa-clipboard-list"></i></span>',
+                    'url' => route('form-definitions.index'),
+                    'title' => 'Formulários',
+                    'can' => config('uspdev-forms.adminGate'), // controla permissão via Gate
+                ];
+            }
+            return $event->item;
+        });
     }
 }
