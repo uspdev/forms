@@ -41,6 +41,15 @@ class FormDefinition extends Model
     }
 
     /**
+     * Filtro para buscar por campos específicos dentro do JSON de fields.
+     */
+    public function scopeFilter($query, string $key, mixed $value)
+    {
+        return $query->whereJsonContains("fields->{$key}", $value);
+    }
+
+
+    /**
      * Get the the submissions for the form definition
      */
     public function formSubmissions(): HasMany

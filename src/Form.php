@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\Validator;
 use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Forms\Models\FormSubmission;
 use Illuminate\Support\Facades\Auth;
-use \Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Str;
+use Illuminate\Support\MessageBag;
 
 class Form
 {
-
     /** Chave definida pelo usuário para esta instancia do form */
     public $key;
 
@@ -33,9 +34,9 @@ class Form
 
     /** se true, pode ser editado. nesse caso precisa passar o id da submissão */
     public $editable; // bool
-    
+
     public $user;
-    
+
     public $admin;
 
     public function __construct($config = [])
@@ -57,6 +58,7 @@ class Form
     /**
      * Processa submissões do form persistindo em banco de dados
      *
+     * Faz a validação dos campos do form
      * Dentro do request precisa ter form_definition, form_key
      * user é opcional para o caso do form ser aberto
      *
@@ -68,75 +70,106 @@ class Form
      */
     public function handleSubmission(Request $request)
     {
+        if (!$this->editable) {
+            return 'Form não editável. Passe editable=true';
+        }
+
         // Retrieve the form definition by id
         if (!($definition = $this->getDefinition($request->form_definition))) {
-            return response()->json('Error on finding form definition');
+            return 'Erro ao buscar formDefinition';
         }
 
         // Lets store only valid form fields
-        $data = $this->validate($request);
-        if ($this->editable && $request->id) {
-            $form = FormSubmission::where('id', $request->id)->firstOrFail();
-            $form->data = $data;
-            $form->save();
+        $validated = $this->validate($request);
 
-            return $form;
+        if ($validated['status'] === 'error') {
+            return $validated;
+        }
+
+        $data = $validated['data'];
+        
+        if ($request->id) {
+            // atualiza registro existente
+            $form = FormSubmission::where('id', $request->id)->firstOrFail();
         } else {
-            $formSubmission = FormSubmission::Create([
+            // cria novo registro
+            $form = FormSubmission::Create([
                 'form_definition_id' => $definition->id,
                 'user_id' => $request->user() ? $request->user()->id : null,
                 'key' => $request->form_key,
-                'data' => $data,
+                'data' => [],
             ]);
+        }
 
-            if($request->hasFile('file')){
+        $data = array_merge($form->data, $data);
+
+        // remove arquivo existente
+        if ($request->has('remover')) {
+            foreach ($request->remover as $fieldName) {
+                if (isset($form->data[$fieldName])) {
+                    $filePath = $form->data[$fieldName]['stored_path'];
+                    if (\Storage::disk('public')->exists($filePath)) {
+                        \Storage::disk('public')->delete($filePath);
+                    }
+                    unset($data[$fieldName]);
+                }
+            }
+        } else {
+            // trata arquivos enviados
+            if ($request->hasFile('file')) {
                 foreach ($request->file('file') as $fieldName => $file) {
                     $fileHash = md5_file($file->path());
-                    $originalName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) 
-                            . '.' . $file->getClientOriginalExtension();
-                    $storedName = 'id' . $formSubmission->id . '-' . $fileHash . '.' . $file->getClientOriginalExtension();
+                    $extension = $file->getClientOriginalExtension();
+                    $name = $file->getClientOriginalName();
+                    $originalName = Str::slug(pathinfo($name, PATHINFO_FILENAME)) . '.' . $extension;
 
-                    $path = $file->storeAs(
-                        'formsubmissions/' . date('Y/m'),
-                        $storedName,
-                        'public'
-                    );
-                    
+                    $storedName = 'id' . $form->id . '-' . $fileHash . '.' . $extension;
+
+                    $path = $file->storeAs('formsubmissions/' . date('Y'), $storedName, 'public');
+
                     $data[$fieldName] = [
                         'original_name' => $originalName,
                         'stored_path' => $path,
-                        'content_hash' => $fileHash
+                        'content_hash' => $fileHash,
                     ];
-                    $formSubmission->data = $data;
-                    $formSubmission->save();
                 }
             }
-
-            return $formSubmission;
         }
+
+        $form->data = $data;
+        $form->save();
+
+        return $form;
     }
 
     /**
-     * Validate form submission and return validated data
+     * Validate form submission and return standardized response.
+     *
+     * @return array
      */
     public function validate($request)
     {
-        // Retrieve the form definition by id
         if (!($definition = $this->getDefinition($request->form_definition))) {
-            return response()->json('Error on finding form definition');
+            return [
+                'status' => 'error',
+                'message' => 'Erro ao buscar o formDefinition',
+            ];
         }
 
-        // Validate the incoming request data based on form fields
         $rules = $this->getValidationRules($definition);
         $validator = Validator::make($request->all(), $rules);
 
-        // Handle validation failure
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return [
+                'status' => 'error',
+                'errors' => $validator->errors(),
+            ];
         }
 
-        $data = $request->only(array_keys($rules));
-        return $data;
+        return [
+            'status' => 'success',
+            'data' => $request->only(array_keys($rules)),
+        ];
     }
 
     /**
@@ -147,7 +180,6 @@ class Form
         $rules = [];
 
         foreach ($definition->fields as $field) {
-
             if (array_is_list($field)) {
                 foreach ($field as $f) {
                     $rules[$f['name']] = self::getFieldValidationRule($f);
@@ -165,17 +197,21 @@ class Form
     protected static function getFieldValidationRule($field)
     {
         // required or nullable
-        if (isset($field['required']) && $field['required']) {
-            $rule = 'required';
-        } else {
-            $rule = 'nullable';
+        $rule = !empty($field['required']) ? 'required' : 'nullable';
+
+        $rulesMap = [
+            'email' => 'email',
+            'number' => 'numeric',
+            'date' => 'date',
+            'url' => 'url',
+            'file' => 'file',
+            'select' => 'in:' . implode(',', $field['options'] ?? []),
+        ];
+
+        if (isset($rulesMap[$field['type']])) {
+            $rule .= '|' . $rulesMap[$field['type']];
         }
 
-        // Add additional rules based on field type
-        // Example: if field type is 'email'
-        if ($field['type'] === 'email') {
-            $rule .= '|email';
-        }
         return $rule;
     }
 
@@ -187,16 +223,12 @@ class Form
      */
     public function generateHtml(?string $formName = null, $formSubmission = null)
     {
-        if (
-            !($this->definition = $this->getDefinition($formName ?? $this->name)) &&
-            !($this->definition = $formSubmission->formDefinition)
-        ) {
+        if (!($this->definition = $this->getDefinition($formName ?? $this->name)) && !($this->definition = $formSubmission->formDefinition)) {
             return null;
         }
 
         $fields = '';
         foreach ($this->definition->fields as $field) {
-
             if (array_is_list($field)) {
                 // agrupando campos na mesma linha: igual para bs4 e bs5
                 $fields .= '<div class="row">';
@@ -213,12 +245,10 @@ class Form
             $this->btnLabel = 'Atualizar';
         }
 
-        $form = view('uspdev-forms::partials.form', [
+        return view('uspdev-forms::partials.form', [
             'form' => $this,
             'fields' => $fields,
         ])->render();
-
-        return $form;
     }
 
     /**
@@ -238,7 +268,8 @@ class Form
             $field['old'] = $formSubmission->data[$field['name']];
         }
 
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden','time','date', 'pessoa-usp', 'disciplina-usp', 'file'])) {
+        // vamos escolher o template do input com base no 'type'
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file'])) {
             $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('field'))->render();
@@ -249,13 +280,13 @@ class Form
 
     /**
      * List form submissions filtering by key and optionally by formName
-     * 
+     *
      * If there's no specific key, it lists all submissions
      */
     public function listSubmission($formName = null)
     {
         $cond = [];
-        if($this->key != config('uspdev-forms.defaultKey')){
+        if ($this->key != config('uspdev-forms.defaultKey')) {
             $cond['key'] = $this->key;
         }
 
@@ -271,9 +302,11 @@ class Form
      */
     public function whereSubmissionContains($field, $string)
     {
-        return $this->admin == true 
-            ? FormSubmission::all()
-            : FormSubmission::whereJsonContains('data->' . $field, (string) $string)->get();
+        if ($this->admin == true) {
+            return FormSubmission::all();
+        } else {
+            return FormSubmission::whereJsonContains('data->' . $field, (string) $string)->get();
+        }
     }
 
     /**
@@ -295,8 +328,9 @@ class Form
     /**
      * Updates a form submission and registers the activity
      */
-    public function updateSubmission(Request $request, $formSubmissionId, $user){
-        if($this->editable){
+    public function updateSubmission(Request $request, $formSubmissionId)
+    {
+        if ($this->editable) {
             $request->id = $formSubmissionId;
             $formSubmission = $this->handleSubmission($request);
 
@@ -308,15 +342,17 @@ class Form
     /**
      * Deletes a form submission and registers the activity
      */
-    public function deleteSubmission($id, $user)
+    public function deleteSubmission($id, $user = null)
     {
+        $user = $user ?? Auth::user();
         $submission = $this->getSubmission($id);
 
         $mockSubmission = $submission;
-        if($submission->delete()){
+        if ($submission->delete()) {
             activity()->performedOn($mockSubmission)->causedBy($user)->log('Chave excluída');
             return $mockSubmission;
-        } return false;
+        }
+        return false;
     }
 
     /**

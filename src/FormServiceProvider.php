@@ -29,13 +29,14 @@ class FormServiceProvider extends ServiceProvider
         ], 'forms-migrations');
 
         // Load migrations
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        // $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'uspdev-forms');
 
         // Load routes
-        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
         // Registra a diretiva
+        // para chamar use @submissionsTable($form) 
         Blade::directive('submissionsTable', function ($form) {
             return "<?php echo view('uspdev-forms::partials.submissions-table', ['form' => $form])->render(); ?>";
         });
