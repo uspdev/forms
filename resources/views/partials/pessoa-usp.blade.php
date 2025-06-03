@@ -49,7 +49,7 @@
 
     $oSelect2Pessoa.select2({
       ajax: {
-        url: '{{ route('form.user.find') }}',
+        url: '{{ route('form.find.pessoa') }}',
         dataType: 'json',
         delay: 1000
       },

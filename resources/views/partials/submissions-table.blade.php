@@ -1,5 +1,8 @@
 {{-- 
 
+  DEPRECADO: usar componente
+  <x-uspdev-forms::submissions-table :form="$form"></x-submission-table>
+
   Esta é uma diretiva blade.
   @submissionTable($form)
   
@@ -8,7 +11,7 @@
   <thead>
     <tr>
       @foreach ($form->getDefinition()->flattenFields() as $field)
-        <th>{{ $field['label']  ?? $field['name']}}</th>
+        <th>{{ $field['label'] ?? $field['name'] }}</th>
       @endforeach
       @if ($form->editable)
         <th></th>
@@ -16,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    @forelse ($form->listSubmission($form->name) as $submission)
+    @foreach ($form->listSubmission($form->name) as $submission)
       <tr>
         @foreach ($form->getDefinition()->flattenFields() as $field)
           <td style="overflow: hidden; text-overflow: ellipsis; ">
@@ -24,22 +27,18 @@
               {{ $submission['data'][$field['name']] }}
               {{ \Uspdev\Replicado\Pessoa::retornarNome($submission['data'][$field['name']]) ?? $submission['data'][$field['name']] }}
             @elseif ($field['type'] == 'checkbox')
-              {{ json_encode($submission['data'][$field['name']]) ?? 'n/a' }}
+              {{ isset($submission['data'][$field['name']]) ? json_encode($submission['data'][$field['name']]) : 'n/a' }}
             @else
               {{ $submission['data'][$field['name']] ?? 'n/a' }}
             @endif
           </td>
         @endforeach
-        @if ($form->editable)
-          <td>
-            <a href="{{ url()->current() }}/{{ $submission->id }}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
-          </td>
-        @endif
+        {{-- @if ($form->editable) --}}
+        <td>
+          <a href="{{ url()->current() }}/{{ $submission->id }}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+        </td>
+        {{-- @endif --}}
       </tr>
-    @empty
-      <tr>
-        <td class="text-center">Nenhuma submissão encontrada.</td>
-      </tr>
-    @endforelse
+    @endforeach
   </tbody>
 </table>
