@@ -199,13 +199,23 @@ class Form
         // required or nullable
         $rule = !empty($field['required']) ? 'required' : 'nullable';
 
+        $options = $field['options'] ?? [];
+        $options = is_array($options) ? $options : [];
+        $values = [];
+        if (!empty($options)) {
+            $values = array_map(function($option) {
+                return is_array($option) && isset($option['value']) ? $option['value'] : $option;
+            }, $options);
+        }
+
         $rulesMap = [
             'email' => 'email',
             'number' => 'numeric',
             'date' => 'date',
             'url' => 'url',
             'file' => 'file',
-            'select' => 'in:' . implode(',', $field['options'] ?? []),
+            'select' => 'array',
+            'select.*' =>  ['in:' . implode(',', $values)]
         ];
 
         if (isset($rulesMap[$field['type']])) {
