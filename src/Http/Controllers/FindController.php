@@ -4,6 +4,7 @@ namespace Uspdev\Forms\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Uspdev\Forms\Replicado\Graduacao;
+use Uspdev\Forms\Replicado\Bempatrimoniado;
 use Uspdev\Replicado\Pessoa;
 
 class FindController extends Controller
@@ -81,4 +82,22 @@ class FindController extends Controller
 
         return response()->json(['results' => $results]);
     }
+
+    /**
+     * Busca para ajax do select2 de patrimonios
+     */
+    public function patrimonio(Request $request)
+    {
+        if (! $request->term) {
+            return response()->json(['results' => []]);
+        }
+
+        $results = [];
+
+        if (hasReplicado()) {
+            $results = Bempatrimoniado::listarPatrimoniosAjax($request->term);
+        }
+        return response()->json(['results' => $results]);
+    }
+
 }

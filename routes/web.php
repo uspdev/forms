@@ -28,4 +28,5 @@ Route::group(['prefix' => config('uspdev-forms.prefix'), 'middleware' => ['web']
 
     Route::get('/find/disciplina', [FindController::class, 'disciplina'])->name('form.find.disciplina');
     Route::get('/find/pessoa', [FindController::class, 'pessoa'])->name('form.find.pessoa');
+    Route::get('/find/patrimonio', [FindController::class, 'patrimonio'])->name('form.find.patrimonio');
 });

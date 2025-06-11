@@ -279,7 +279,7 @@ class Form
         }
 
         // vamos escolher o template do input com base no 'type'
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file'])) {
+        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file', 'patrimonio-usp'])) {
             $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('field'))->render();
