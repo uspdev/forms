@@ -22,6 +22,5 @@ return [
     'adminGate' => 'admin',
 
     # Quem pode realizar buscas: geralmente é o usuário logado
-    'findUsersGate' => 'user',
-    'findDisciplinasGate' => 'user',
+    'findGate' => 'user',
 ];

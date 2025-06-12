@@ -14,7 +14,7 @@ class FindController extends Controller
      */
     public function disciplina(Request $request)
     {
-        $this->authorize(config('uspdev-forms.findDisciplinasGate'));
+        $this->authorize(config('uspdev-forms.findGate'));
 
         if (! $request->term) {
             return response([]);
@@ -44,7 +44,7 @@ class FindController extends Controller
      */
     public function pessoa(Request $request)
     {
-        $this->authorize(config('uspdev-forms.findUsersGate'));
+        $this->authorize(config('uspdev-forms.findGate'));
 
         if (! $request->term) {
             return response([]);
@@ -88,6 +88,8 @@ class FindController extends Controller
      */
     public function patrimonio(Request $request)
     {
+        $this->authorize(config('uspdev-forms.findGate'));
+
         if (! $request->term) {
             return response()->json(['results' => []]);
         }
