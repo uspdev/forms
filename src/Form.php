@@ -320,6 +320,56 @@ class Form
     }
 
     /**
+     * Lista as submissões com filtro
+     * 
+     * @param string $field Nome do campo do json dentro de data a ser filtrado
+     * @param string $operator Operador de comparação. Suporta: contains, =, ==, !=, empty, not_empty
+     * @param mixed $value Valor a ser comparado. Pode ser string, array ou null
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function filterSubmissionByField($field, $operator, $value = null)
+    {
+        $jsonField = "data->$field";
+
+        $query = new FormSubmission;
+        if ($this->name) {
+            $query::where('form_definition_id', $this->getDefinition($this->name)->id);
+        }
+        if ($this->key) {
+            $query::where('key', $this->key);
+        }
+
+        switch ($operator) {
+            case 'contains':
+                // valor dentro do JSON (array ou string)
+                return $query::whereJsonContains($jsonField, (string) $value)->get();
+
+            case '=':
+            case '==':
+                return $query::where($jsonField, $value)->get();
+
+            case '!=':
+                return $query::where($jsonField, '!=', $value)->get();
+
+            case 'empty':
+                return $query::where(function ($query) use ($jsonField) {
+                    $query->whereNull($jsonField)
+                        ->orWhere($jsonField, '');
+                })->get();
+
+            case 'not_empty':
+                return $query::where(function ($query) use ($jsonField) {
+                    $query->whereNotNull($jsonField)
+                        ->where($jsonField, '!=', '');
+                })->get();
+
+            default:
+                throw new \InvalidArgumentException("Operador '$operator' não suportado.");
+        }
+    }
+
+
+    /**
      * Get a form submission by id
      */
     public function getSubmission($id)
