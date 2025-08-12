@@ -151,6 +151,19 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
 ]
 ```
 
+* patrimonio-usp
+
+```json
+[
+  {
+    "name": "patrimonio",
+    "type": "patrimonio-usp",
+    "label": "Patrimonio (select2)",
+    "required": true
+  }
+]
+```
+
     FormDefinition::create($form);
 
 
@@ -203,6 +216,8 @@ $formSubmission = $form->getSubmission($formSubmissionId);
 ### Tipos
 
 * pessoa-usp: campo tipo select que faz busca no replicado e retorna uma pessoa. nome do campo recomendado: codpes;
+* disciplina-usp: campo tipo select que faz busca no replicado e retorna uma disciplina. nome do campo recomendado: coddis;
+* patrimonio-usp: campo tipo select que faz busca no replicado e retorna um bem patrimoniado. nome do campo recomendado: patrimonio;
 * text: texto simples
 * email: valida campos email
 * select: precisa passar `options`
