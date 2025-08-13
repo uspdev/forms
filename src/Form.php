@@ -266,6 +266,8 @@ class Form
      */
     protected function generateField($field, $formSubmission)
     {
+        $types = ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file', 'patrimonio-usp', 'local-usp'];
+        
         $field['bs'] = config('uspdev-forms.bootstrapVersion');
         $field['required'] = isset($field['required']) ? $field['required'] : false;
         $field['requiredLabel'] = $field['required'] ? ' <span class="text-danger">*</span>' : '';
@@ -279,7 +281,7 @@ class Form
         }
 
         // vamos escolher o template do input com base no 'type'
-        if (in_array($field['type'], ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file', 'patrimonio-usp'])) {
+        if (in_array($field['type'], $types)) {
             $html = view('uspdev-forms::partials.' . $field['type'], compact('field'))->render();
         } else {
             $html = view('uspdev-forms::partials.default', compact('field'))->render();

@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Uspdev\Forms\Replicado\Graduacao;
 use Uspdev\Forms\Replicado\Bempatrimoniado;
+use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
 
 class FindController extends Controller
@@ -99,6 +100,37 @@ class FindController extends Controller
         if (hasReplicado()) {
             $results = Bempatrimoniado::listarPatrimoniosAjax($request->term);
         }
+        return response()->json(['results' => $results]);
+    }
+
+    /**
+     * Busca para ajax do select2 de locais/setores
+     */
+    public function local(Request $request)
+    {
+        $this->authorize(config('uspdev-forms.findGate'));
+
+        if (!$request->term) {
+            return response()->json(['results' => []]);
+        }
+
+        $results = [];
+
+        if (hasReplicado()) {
+            $locais = Estrutura::procurarLocal($request->term);
+
+            $results = collect($locais)->map(function ($item) {
+                return [
+                    'id'   => $item['codlocusp'],
+                    'text' => $item['codlocusp'] . ' - ' . $item['epflgr'] . ', ' . $item['numlgr'] .
+                            ' (' . $item['sglund'] . ')' .
+                            ' - Bloco: ' . $item['idfblc'] .
+                            ' - Andar: ' . $item['idfadr'] .
+                            ' - ' . $item['idfloc']
+                ];
+            })->all();
+        }
+
         return response()->json(['results' => $results]);
     }
 
