@@ -96,7 +96,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
       "4",
       "5"
     ]
-  }
+  },
 ]
 ```
 
@@ -108,7 +108,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
     "name": "message",
     "type": "textarea",
     "label": "Mensagem (textarea)"
-  }
+  },
 ]
 ```
 
@@ -121,7 +121,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
     "type": "file",
     "label": "Arquivo",
     "accept": ".pdf, image/*"
-  }
+  },
 ]
 ```
 
@@ -147,7 +147,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
     "type": "disciplina-usp",
     "label": "Disciplina (select2)",
     "required": true
-  }
+  },
 ]
 ```
 
@@ -160,7 +160,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
     "type": "patrimonio-usp",
     "label": "Patrimonio (select2)",
     "required": true
-  }
+  },
 ]
 ```
 
@@ -173,7 +173,7 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
     "type": "local-usp",
     "label": "Local (select2)",
     "required": true
-  }
+  },
 ]
 ```
 
@@ -185,10 +185,10 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
 Use a classe FormGenerator para renderizar o formulário no seu template Blade:
 
 ```php
-use Uspdev\Forms\Forms;
+use Uspdev\Forms\Form;
 
-$form = new Form($key = null, ['action' => route('sua-rota-do-action')]);
-$formHtml = $form->generateHtml('contact_form'); // conforme definido em $form
+$form = new Form($key = null, ['action' => route('forms.action')]);
+$formHtml = $form->generateHtml('demo'); // conforme definido em $form
 
 // ....
 ```
@@ -230,16 +230,13 @@ $formSubmission = $form->getSubmission($formSubmissionId);
 
 * pessoa-usp: campo tipo select que faz busca no replicado e retorna uma pessoa. nome do campo recomendado: codpes;
 * disciplina-usp: campo tipo select que faz busca no replicado e retorna uma disciplina. nome do campo recomendado: coddis;
-* patrimonio-usp: campo tipo select que faz busca no replicado e retorna um bem patrimoniado. nome do campo recomendado: patrimonio;
-* local-usp: campo tipo select que faz busca no replicado e retorna um local da usp já formatado. nome do campo recomendado: local;
+* patrimonio-usp: campo tipo select que faz busca no replicado e retorna um bem patrimoniado. nome do campo recomendado: numpat;
+* local-usp: campo tipo select que faz busca no replicado e retorna um local da usp já formatado. nome do campo recomendado: codlocusp;
 * text: texto simples
 * email: valida campos email
 * select: precisa passar `options`
 * textarea:
 * file: pode passar `"accept" : ".pdf, image/*"`
-
-
-
 
 ## Contribuindo
 
@@ -251,9 +248,6 @@ Contribuições são bem-vindas! Siga estes passos para contribuir:
 - Envie para o branch (git push origin feature/SuaFuncionalidade).
 - Crie um novo Pull Request.
 
-## Licença
-
-Este pacote está licenciado sob a Licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 ### Resumo do Conteúdo
 - **Visão Geral do Pacote**: Descreve o que o pacote faz.
