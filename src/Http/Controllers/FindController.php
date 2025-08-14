@@ -105,6 +105,8 @@ class FindController extends Controller
 
     /**
      * Busca para ajax do select2 de locais/setores
+     * 
+     * Retorna os locais no formato: codigo - nome, endereço (sigla) - Bloco: bloco - Andar: andar - setor
      */
     public function local(Request $request)
     {

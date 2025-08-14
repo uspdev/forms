@@ -164,6 +164,19 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
 ]
 ```
 
+* local-usp
+
+```json
+[
+  {
+    "name": "local",
+    "type": "local-usp",
+    "label": "Local (select2)",
+    "required": true
+  }
+]
+```
+
     FormDefinition::create($form);
 
 
@@ -218,6 +231,7 @@ $formSubmission = $form->getSubmission($formSubmissionId);
 * pessoa-usp: campo tipo select que faz busca no replicado e retorna uma pessoa. nome do campo recomendado: codpes;
 * disciplina-usp: campo tipo select que faz busca no replicado e retorna uma disciplina. nome do campo recomendado: coddis;
 * patrimonio-usp: campo tipo select que faz busca no replicado e retorna um bem patrimoniado. nome do campo recomendado: patrimonio;
+* local-usp: campo tipo select que faz busca no replicado e retorna um local da usp já formatado. nome do campo recomendado: local;
 * text: texto simples
 * email: valida campos email
 * select: precisa passar `options`
