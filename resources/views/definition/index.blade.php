@@ -17,6 +17,7 @@
         <thead>
           <tr>
             <th>Nome</th>
+            <th>Grupo</th>
             <th>Descrição</th>
             <th>Ações</th>
           </tr>
@@ -26,9 +27,15 @@
             <tr>
               <td>
                 {{ $formDefinition->name }}
-                <span class="badge badge-primary badge-pill">{{ $formDefinition->formSubmissions->count() }}</span>
-                <span
-                  class="badge badge-danger badge-pill">{{ $formDefinition->formSubmissions()->onlyTrashed()->count() }}</span>
+                <span class="badge badge-primary badge-pill" title="Submissões">
+                  {{ $formDefinition->formSubmissions->count() }}
+                </span>
+                <span class="badge badge-danger badge-pill" title="Submissões excluídas">
+                  {{ $formDefinition->formSubmissions()->onlyTrashed()->count() }}
+                </span>
+              </td>
+              <td>
+                {{ $formDefinition->group }}
               </td>
               <td>
                 {{ $formDefinition->description }}
