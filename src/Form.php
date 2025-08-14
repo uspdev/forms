@@ -87,7 +87,7 @@ class Form
         }
 
         $data = $validated['data'];
-        
+
         if ($request->id) {
             // atualiza registro existente
             $form = FormSubmission::where('id', $request->id)->firstOrFail();
@@ -203,7 +203,7 @@ class Form
         $options = is_array($options) ? $options : [];
         $values = [];
         if (!empty($options)) {
-            $values = array_map(function($option) {
+            $values = array_map(function ($option) {
                 return is_array($option) && isset($option['value']) ? $option['value'] : $option;
             }, $options);
         }
@@ -266,8 +266,9 @@ class Form
      */
     protected function generateField($field, $formSubmission)
     {
-        $types = ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'pessoa-usp', 'disciplina-usp', 'file', 'patrimonio-usp', 'local-usp'];
-        
+        // tipos de entradas do form conhecidos
+        $types = ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
+
         $field['bs'] = config('uspdev-forms.bootstrapVersion');
         $field['required'] = isset($field['required']) ? $field['required'] : false;
         $field['requiredLabel'] = $field['required'] ? ' <span class="text-danger">*</span>' : '';

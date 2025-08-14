@@ -23,12 +23,12 @@
       <form id="form-definition-form"
         action="{{ isset($formDefinition) ? route('form-definitions.update', $formDefinition) : route('form-definitions.store') }}"
         method="POST">
-        @csrf
         @isset($formDefinition)
           @method('PUT')
         @endisset
+        @csrf
         <div class="form-group">
-          <label for="name">Nome do formulário <span class="text-danger">*</span></label>
+          <label for="name">Nome do formulário (não repetido) <span class="text-danger">*</span></label>
           <input type="text" id="name" name="name" class="form-control"
             value="{{ old('name', $formDefinition->name ?? '') }}" required>
         </div>

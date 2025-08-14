@@ -1,4 +1,6 @@
 {{-- 
+  Mostra uma tabela com as submissões de um formulário.
+  
   Chamar com:
   <x-uspdev-forms::submissions-table :form="$form"></x-submission-table>
 
@@ -21,12 +23,10 @@
         <tr>
           @foreach ($form->getDefinition()->flattenFields() as $field)
             <td>
-
               @includeFirst([
                   'uspdev-forms::partials.' . $field['type'] . '-view',
                   'uspdev-forms::partials.default-view',
               ])
-
             </td>
           @endforeach
           <td>

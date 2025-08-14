@@ -10,17 +10,20 @@
   <select id="{{ $field['id'] }}" name="{{ $field['name'] }}" class="{{ $field['controlClass'] }}" @required($field['required'])>
     <option value="">Digite o nome ou codpes..</option>
     @if (isset($formSubmission) && isset($formSubmission->data[$field['name']]))
-      <option value="{{ $formSubmission->data[$field['name']] }}" selected>{{ $formSubmission->data[$field['name']] }} 
-      {{ \Uspdev\Replicado\Pessoa::retornarNome($formSubmission->data[$field['name']]) }}</option>
+      <option value="{{ $formSubmission->data[$field['name']] }}" selected>
+        {{ $formSubmission->data[$field['name']] }}
+        {{ \Uspdev\Replicado\Pessoa::retornarNome($formSubmission->data[$field['name']]) }}
+      </option>
     @elseif ($field['old'])
       <option value="{{ $field['old'] }}" selected>
         {{ $field['old'] }} {{ \Uspdev\Replicado\Pessoa::retornarNome($field['old']) }}
       </option>
     @elseif(\Illuminate\Support\Facades\Auth::user())
-      <option value="{{ \Illuminate\Support\Facades\Auth::user()->codpes }}" selected>{{ \Illuminate\Support\Facades\Auth::user()->codpes }} 
-      {{ \Uspdev\Replicado\Pessoa::retornarNome(\Illuminate\Support\Facades\Auth::user()->codpes) }}</option>
+      <option value="{{ \Illuminate\Support\Facades\Auth::user()->codpes }}" selected>
+        {{ \Illuminate\Support\Facades\Auth::user()->codpes }}
+        {{ \Uspdev\Replicado\Pessoa::retornarNome(\Illuminate\Support\Facades\Auth::user()->codpes) }}
+      </option>
     @endif
-    
   </select>
 </div>
 
