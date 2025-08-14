@@ -16,6 +16,8 @@ class DefinitionController extends Controller
 
     public function index()
     {
+        \UspTheme::activeUrl(route('form-definitions.index'));
+        
         $formDefinitions = FormDefinition::all();
         return view('uspdev-forms::definition.index', compact('formDefinitions'));
     }
@@ -27,6 +29,7 @@ class DefinitionController extends Controller
 
     public function create()
     {
+        \UspTheme::activeUrl(route('form-definitions.index'));
         return view('uspdev-forms::definition.create', ['formDefinition' => null]);
     }
 
@@ -54,6 +57,7 @@ class DefinitionController extends Controller
 
     public function edit(FormDefinition $formDefinition)
     {
+        \UspTheme::activeUrl(route('form-definitions.index'));
         return view('uspdev-forms::definition.create', compact('formDefinition'));
     }
 

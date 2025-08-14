@@ -19,6 +19,7 @@ class SubmissionController extends Controller
 
     public function index(FormDefinition $formDefinition)
     {
+        \UspTheme::activeUrl(route('form-definitions.index'));
         $config = [
             'editable' => true,
             'name' => $formDefinition->name,
@@ -33,21 +34,26 @@ class SubmissionController extends Controller
 
     public function create(FormDefinition $formDefinition)
     {
-        $definition = $formDefinition;
-        $submission = null;
-        
+        \UspTheme::activeUrl(route('form-definitions.index'));
+
         $config = [
-            $key = null,
+            'key' => null,
             'action' => route('form-submissions.store', $formDefinition),
         ];
         $form = new Form($config);
         $formHtml = $form->generateHtml($formDefinition->name);
 
-        return view('uspdev-forms::submission.edit', compact('definition', 'submission', 'formHtml'));
+        return view('uspdev-forms::submission.edit', [
+            'definition' => $formDefinition,
+            'submission' => null,
+            'formHtml' => $formHtml,
+        ]);
     }
 
     public static function edit(FormDefinition $formDefinition, FormSubmission $formSubmission)
     {
+        \UspTheme::activeUrl(route('form-definitions.index'));
+
         $formHtml = (new Form(['method' => 'PUT']))->generateHtml($formDefinition->name, $formSubmission);
 
         return view('uspdev-forms::submission.edit')->with([
