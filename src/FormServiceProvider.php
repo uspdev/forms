@@ -35,6 +35,12 @@ class FormServiceProvider extends ServiceProvider
         // Load routes
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Uspdev\Forms\Console\Commands\Demo::class,
+            ]);
+        }
+
         // Registra a diretiva
         // para chamar use @submissionsTable($form) 
         Blade::directive('submissionsTable', function ($form) {
