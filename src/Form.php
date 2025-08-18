@@ -214,7 +214,6 @@ class Form
             'date' => 'date',
             'url' => 'url',
             'file' => 'file',
-            'select' => 'array',
             'select.*' =>  ['in:' . implode(',', $values)]
         ];
 
