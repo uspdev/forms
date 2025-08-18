@@ -71,8 +71,19 @@ class SubmissionController extends Controller
             return redirect()->route('form-submissions.index', $formDefinition)
                 ->with('alert-success', 'Submissão criada com sucesso!');
         }
+
+        if (is_array($submission)) {
+            $message = '';
+            $errors = $submission['errors'];
+            foreach ($errors->getMessages() as $campo => $mensagens) {
+                $message .= $campo . ' - ' . $mensagens[0] . "\n";
+            }
+        } else {
+            $message = e($submission);
+        }
+
         return redirect()->back()->withInput()
-            ->with('alert-danger', $submission);
+            ->with('alert-danger', 'Erro: ' . $message);
     }
 
     public static function update(Request $request, FormDefinition $formDefinition, FormSubmission $formSubmission)
@@ -84,8 +95,19 @@ class SubmissionController extends Controller
             return redirect(route('form-submissions.index', $formDefinition))
                 ->with('alert-success', 'Submissão atualizada com sucesso!');
         }
+
+        if (is_array($submission)) {
+            $message = '';
+            $errors = $submission['errors'];
+            foreach ($errors->getMessages() as $campo => $mensagens) {
+                $message .= $campo . ' - ' . $mensagens[0] . "\n";
+            }
+        } else {
+            $message = e($submission);
+        }
+
         return redirect()->back()->withInput()
-            ->with('alert-danger', 'Erro: ' . $submission);
+            ->with('alert-danger', 'Erro: ' . $message);
     }
 
     public static function destroy(FormDefinition $formDefinition, FormSubmission $formSubmission)
