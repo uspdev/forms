@@ -36,8 +36,14 @@ No arquivo `config/laravel-usp-theme.php`, adicione ou reposicione a chave uspde
 Você pode personalizar as configurações do pacote modificando o arquivo `config/uspdev-forms.php`.
 
     php artisan vendor:publish --tag=forms-config
-   
-   
+
+## Comando Artisan forms:demo
+Popula o banco com um formulário de de demonstração com vários tipos de campos, facilitando testes rápidos.
+
+```bash
+php artisan forms:demo
+```
+    
 ## Uso
 
 1. **Crie uma entrada na tabela form_definitions**
