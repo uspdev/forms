@@ -37,7 +37,7 @@ class FormServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Uspdev\Forms\Console\Commands\Demo::class,
+                \Uspdev\Forms\Console\Commands\FormDemo::class,
             ]);
         }
 
