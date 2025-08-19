@@ -8,11 +8,16 @@
  --}}
 @props(['form' => $form])
 
+@php
+  $definition = $form->getDefinition();
+@endphp
+
+@endphp
 <div class="table-responsive">
   <table class="table table-striped table-bordered datatable-simples">
     <thead>
       <tr>
-        @foreach ($form->getDefinition()->flattenFields() as $field)
+        @foreach ($definition->flattenFields() as $field)
           <th>{{ $field['label'] ?? $field['name'] }}</th>
         @endforeach
         <th style="width: 40px"></th>
@@ -30,7 +35,11 @@
             </td>
           @endforeach
           <td>
-            <a href="{{ url()->current() }}/{{ $submission->id }}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+            <div class="d-flex">
+              @include('uspdev-forms::submission.partials.edit-btn')
+              <div class="px-1"></div>
+              @include('uspdev-forms::submission.partials.delete-btn')
+            </div>
           </td>
         </tr>
       @endforeach
