@@ -56,6 +56,8 @@ php artisan forms:demo
 
 5. Campos: campos do formulário
 
+    OBS.: **Os campos USP dependem do replicado**.
+
 * **texto de 1 linha**
 
 ```json
@@ -138,7 +140,7 @@ php artisan forms:demo
   {
     "name": "codpes",
     "type": "pessoa-usp",
-    "label": "Pessoa (select2)",
+    "label": "Pessoa USP",
     "required": true
   },
 ]
@@ -151,7 +153,7 @@ php artisan forms:demo
   {
     "name": "coddis",
     "type": "disciplina-usp",
-    "label": "Disciplina (select2)",
+    "label": "Disciplina USP",
     "required": true
   },
 ]
@@ -162,9 +164,9 @@ php artisan forms:demo
 ```json
 [
   {
-    "name": "patrimonio",
+    "name": "numpat",
     "type": "patrimonio-usp",
-    "label": "Patrimonio (select2)",
+    "label": "Patrimônio USP",
     "required": true
   },
 ]
@@ -175,9 +177,9 @@ php artisan forms:demo
 ```json
 [
   {
-    "name": "local",
+    "name": "codlocusp",
     "type": "local-usp",
-    "label": "Local (select2)",
+    "label": "Local USP",
     "required": true
   },
 ]
