@@ -46,7 +46,9 @@
         dataType: 'json',
         delay: 1000
       },
-      minimumInputLength: 5,
+      allowClear: true,
+      placeholder: 'Selecione uma disciplina...',
+      minimumInputLength: 3,
       theme: 'bootstrap4',
       width: 'resolve',
       language: 'pt-BR'

@@ -55,6 +55,8 @@
         dataType: 'json',
         delay: 1000,
       },
+      allowClear: true,
+      placeholder: 'Digite um número de local...',
       minimumInputLength: 3,
       theme: 'bootstrap4',
       width: 'resolve',

@@ -56,6 +56,8 @@
         dataType: 'json',
         delay: 1000
       },
+      allowClear: true,
+      placeholder: 'Digite o nome ou codpes..',
       minimumInputLength: 4,
       theme: 'bootstrap4',
       width: 'resolve',

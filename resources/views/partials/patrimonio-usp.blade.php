@@ -59,6 +59,8 @@
           return data;
         }
       },
+      allowClear: true,
+      placeholder: 'Digite um número de patrimônio...',
       minimumInputLength: 9,
       theme: 'bootstrap4',
       width: 'resolve',
