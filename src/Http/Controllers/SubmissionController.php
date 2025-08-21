@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Gate;
 use Uspdev\Forms\Form;
 use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Forms\Models\FormSubmission;
-use Illuminate\Support\Facades\Storage;
 
 class SubmissionController extends Controller
 {

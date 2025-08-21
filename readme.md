@@ -232,6 +232,13 @@ Recupere uma submissão específica pelo seu id:
 $formSubmission = $form->getSubmission($formSubmissionId);
 ```
 
+6. **Download de arquivo**
+Faça o download de um arquivo de uma submissão através do nome do campo:
+
+```php
+$formSubmission = $form->downloadSubmissionFile($formSubmission, $fieldName);
+```
+
 ## Campos
 
 ### Tipos
