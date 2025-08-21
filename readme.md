@@ -238,6 +238,7 @@ Faça o download de um arquivo de uma submissão através do nome do campo:
 ```php
 $formSubmission = $form->downloadSubmissionFile($formSubmission, $fieldName);
 ```
+Atenção: o download funcionará corretamente apenas se o diretório formsubmissions estiver armazenado no disco local (storage/app). Caso ele esteja no disco público (storage/app/public), será necessário mover os arquivos para o armazenamento local para garantir o funcionamento do download.
 
 ## Campos
 
