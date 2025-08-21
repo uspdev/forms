@@ -1,4 +1,3 @@
-{{-- @dd($field, $submission['data']) --}}
 @php
   $path = $submission['data'][$field['name']]['stored_path'] ?? null;
   $filename = $submission['data'][$field['name']]['original_name'] ?? null;
@@ -6,7 +5,8 @@
 
 @if (isset($submission['data'][$field['name']]))
   <span title="{{ $filename }}">
-    <a href="{{ asset('storage/' . $path) }}" target="_blank">
+    <a href="{{ route('form-submissions.download-file', ['formDefinition' => $submission->form_definition_id, 'formSubmission' => $submission->id, 'fieldName' => $field['name']]) }}"
+      target="_blank">
       {{ Illuminate\Support\Str::limit($filename, 30) }}
     </a>
   </span>

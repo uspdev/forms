@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Uspdev\Forms\Form;
 use Uspdev\Forms\Models\FormDefinition;
 use Uspdev\Forms\Models\FormSubmission;
+use Illuminate\Support\Facades\Storage;
 
 class SubmissionController extends Controller
 {
@@ -116,5 +117,10 @@ class SubmissionController extends Controller
 
         return redirect(route('form-submissions.index', $formDefinition))
             ->with('alert-success', 'Submissão enviada para lixeira com sucesso!');
+    }
+    
+    public function downloadFile($formDefinition, FormSubmission $formSubmission, $fieldName)
+    {
+        return (new Form())->downloadSubmissionFile($formSubmission, $fieldName);
     }
 }

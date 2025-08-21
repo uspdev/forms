@@ -24,6 +24,7 @@ Route::group(['prefix' => config('uspdev-forms.prefix'), 'middleware' => ['web']
         Route::get('/{formSubmission}/edit', [submissionController::class, 'edit'])->name('form-submissions.edit');
         Route::put('/{formSubmission}/edit', [submissionController::class, 'update'])->name('form-submissions.update');
         Route::delete('/{formSubmission}', [submissionController::class, 'destroy'])->name('form-submissions.destroy');
+        Route::get('/{formSubmission}/download-file/{fieldName}', [submissionController::class, 'downloadFile'])->name('form-submissions.download-file');
     });
 
     Route::get('/find/disciplina', [FindController::class, 'disciplina'])->name('form.find.disciplina');

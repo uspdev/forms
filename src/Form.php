@@ -108,8 +108,8 @@ class Form
             foreach ($request->remover as $fieldName) {
                 if (isset($form->data[$fieldName])) {
                     $filePath = $form->data[$fieldName]['stored_path'];
-                    if (\Storage::disk('public')->exists($filePath)) {
-                        \Storage::disk('public')->delete($filePath);
+                    if (\Storage::disk('local')->exists($filePath)) {
+                        \Storage::disk('local')->delete($filePath);
                     }
                     unset($data[$fieldName]);
                 }
@@ -125,7 +125,7 @@ class Form
 
                     $storedName = 'id' . $form->id . '-' . $fileHash . '.' . $extension;
 
-                    $path = $file->storeAs('formsubmissions/' . date('Y'), $storedName, 'public');
+                    $path = $file->storeAs('formsubmissions/' . date('Y'), $storedName, 'local');
 
                     $data[$fieldName] = [
                         'original_name' => $originalName,
@@ -399,6 +399,23 @@ class Form
             return $formSubmission;
         }
         return false;
+    }
+
+    /**
+     * Downloads a file from a form submission given the field name
+     */
+    public function downloadSubmissionFile(FormSubmission $formSubmission, $fieldName)
+    {
+        $path = $formSubmission->data[$fieldName]['stored_path'] ?? null;
+        if (!\Storage::exists($path)) {
+            return abort(404, 'Arquivo não encontrado');
+        }
+
+        $nomeDownload = preg_replace('/[\x00-\x1F\x7F\/\\\\]/', '-', basename($path));
+        $nomeDownload = $formSubmission->data[$fieldName]['original_name'] ?? $nomeDownload;
+        return response()->download(\Storage::path($path), null, [
+            'Content-Type' => \Storage::mimeType($path),
+        ])->setContentDisposition('attachment', $nomeDownload);
     }
 
     /**
