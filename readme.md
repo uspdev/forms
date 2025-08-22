@@ -37,8 +37,9 @@ Você pode personalizar as configurações do pacote modificando o arquivo `conf
 
     php artisan vendor:publish --tag=forms-config
 
-## Comando Artisan forms:demo
-Popula o banco com um formulário de de demonstração com vários tipos de campos, facilitando testes rápidos.
+## Formulário demo
+
+Popula o banco com um formulário de demonstração com vários tipos de campos, facilitando testes rápidos.
 
 ```bash
 php artisan forms:demo
