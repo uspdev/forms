@@ -77,22 +77,8 @@ class FormDefinition extends Model
                 'all_fields.*.name.required' => 'O nome de cada campo é obrigatório.',
             ];    
 
-            $flatFields = [];
-            $stack = $model->fields;
-
-            while (!empty($stack)) {
-                $field = array_shift($stack);
-                if (is_array($field)) {
-                    if (array_key_exists('name', $field)) {
-                        $flatFields[] = $field;
-                    } else {
-                        $stack = array_merge($field, $stack);
-                    }
-                }
-            }
-
             $data = $model->attributesToArray();
-            $data['all_fields'] = $flatFields;
+            $data['all_fields'] = $model->flattenFields();
 
             $validator = Validator::make($data, $rules, $messages);
 
