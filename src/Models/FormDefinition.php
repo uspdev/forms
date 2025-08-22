@@ -65,7 +65,7 @@ class FormDefinition extends Model
 
         static::saving(function ($model) {
             $rules = [
-                'name'        => 'required|string|max:255',
+                'name'        => 'required|string|max:255|unique:form_definitions,name,' . $model->id,
                 'group'       => 'required|string|max:255',
                 'description' => 'nullable|string|max:255',
                 'fields'      => 'required|array',
