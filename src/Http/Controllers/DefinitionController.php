@@ -43,13 +43,6 @@ class DefinitionController extends Controller
         ]);
 
         $fields = json_decode($request->input('fields'), true);
-        
-        $names = array_column($fields, 'name');
-        if (count($names) !== count(array_unique($names))) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['fields' => 'Os nomes dos campos devem ser únicos.']);
-        }
 
         FormDefinition::create([
             'name'        => $request->input('name'),
@@ -78,13 +71,6 @@ class DefinitionController extends Controller
         ]);
 
         $formDefinition->fields = json_decode($request->input('fields'), true);
-
-        $names = array_column($formDefinition->fields, 'name');
-        if (count($names) !== count(array_unique($names))) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['fields' => 'Os nomes dos campos devem ser únicos.']);
-        }
         
         $formDefinition->save();
 
