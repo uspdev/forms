@@ -11,8 +11,6 @@
 @php
   $definition = $form->getDefinition();
 @endphp
-
-@endphp
 <div class="table-responsive">
   <table class="table table-striped table-bordered datatable-simples">
     <thead>
