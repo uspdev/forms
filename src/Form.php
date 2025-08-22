@@ -9,7 +9,6 @@ use Uspdev\Forms\Models\FormSubmission;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Str;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Storage;
 
 class Form
@@ -109,31 +108,38 @@ class Form
             foreach ($request->remover as $fieldName) {
                 if (isset($form->data[$fieldName])) {
                     $filePath = $form->data[$fieldName]['stored_path'];
-                    if (\Storage::disk('local')->exists($filePath)) {
-                        \Storage::disk('local')->delete($filePath);
-                    }
+                    $deleted = Storage::disk('local')->delete($filePath);
+                    // tratar erro se não conseguir remover o arquivo, geralmente por problemas de permissão
                     unset($data[$fieldName]);
                 }
             }
-        } else {
-            // trata arquivos enviados
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $fieldName => $file) {
-                    $fileHash = md5_file($file->path());
-                    $extension = $file->getClientOriginalExtension();
-                    $name = $file->getClientOriginalName();
-                    $originalName = Str::slug(pathinfo($name, PATHINFO_FILENAME)) . '.' . $extension;
+        }
 
-                    $storedName = 'id' . $form->id . '-' . $fileHash . '.' . $extension;
-
-                    $path = $file->storeAs('formsubmissions/' . date('Y'), $storedName, 'local');
-
-                    $data[$fieldName] = [
-                        'original_name' => $originalName,
-                        'stored_path' => $path,
-                        'content_hash' => $fileHash,
-                    ];
+        // trata upload de arquivos (novos ou substituindo existentes)
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $fieldName => $file) {
+                if (isset($form->data[$fieldName])) {
+                    // se já existe um arquivo nesse campo, vamos remover o antigo
+                    $filePath = $data[$fieldName]['stored_path'];
+                    $deleted = Storage::disk('local')->delete($filePath);
+                    // tratar erro se não conseguir remover o arquivo, geralmente por problemas de permissão
+                    unset($data[$fieldName]);
                 }
+                $fileHash = md5_file($file->path());
+                $extension = $file->getClientOriginalExtension();
+                $name = $file->getClientOriginalName();
+                $originalName = Str::slug(pathinfo($name, PATHINFO_FILENAME)) . '.' . $extension;
+
+                $storedName = 'id' . $form->id . '-' . $fileHash . '.' . $extension;
+                $path = $file->storeAs('formsubmissions/' . date('Y'), $storedName, 'local');
+                if (!$path) {
+                    // tratar erro se não conseguir salvar o arquivo, geralmente por problemas de permissão
+                }
+                $data[$fieldName] = [
+                    'original_name' => $originalName,
+                    'stored_path' => $path,
+                    'content_hash' => $fileHash,
+                ];
             }
         }
 
@@ -408,14 +414,15 @@ class Form
     public function downloadSubmissionFile(FormSubmission $formSubmission, $fieldName)
     {
         $path = $formSubmission->data[$fieldName]['stored_path'] ?? null;
-        if (!\Storage::exists($path)) {
+        if (!Storage::exists($path)) {
             return abort(404, 'Arquivo não encontrado');
         }
 
         $nomeDownload = preg_replace('/[\x00-\x1F\x7F\/\\\\]/', '-', basename($path));
         $nomeDownload = $formSubmission->data[$fieldName]['original_name'] ?? $nomeDownload;
-        return response()->download(\Storage::path($path), null, [
-            'Content-Type' => \Storage::mimeType($path),
+
+        return response()->download(Storage::path($path), null, [
+            'Content-Type' => Storage::mimeType($path),
         ])->setContentDisposition('attachment', $nomeDownload);
     }
 
