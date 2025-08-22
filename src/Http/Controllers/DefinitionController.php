@@ -35,13 +35,6 @@ class DefinitionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'group'       => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'fields'      => 'required|json',
-        ]);
-
         $fields = json_decode($request->input('fields'), true);
 
         FormDefinition::create([
@@ -63,13 +56,6 @@ class DefinitionController extends Controller
 
     public function update(Request $request, FormDefinition $formDefinition)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'group'       => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'fields'      => 'required|json',
-        ]);
-
         $formDefinition->fields = json_decode($request->input('fields'), true);
         
         $formDefinition->save();
