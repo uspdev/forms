@@ -25,6 +25,48 @@ class FormDefinition extends Model
     }
 
     /**
+     * Sobrescreve o método boot do Eloquent Model.
+     *
+     * Registra o evento "saving" para validar os atributos do model antes de salvar:
+     * - name, group e description com regras básicas de string e tamanho
+     * - fields como array obrigatório
+     * - flatFields.*.name deve ser único e obrigatório
+     *
+     * Se algum campo não atender às regras, lança uma ValidationException.
+     *
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $rules = [
+                'name'        => 'required|string|max:255|unique:form_definitions,name,' . $model->id,
+                'group'       => 'required|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'fields'      => 'required|array',
+                'flat_fields.*.name' => 'required|string|distinct',
+            ];
+
+            $messages = [
+                'flat_fields.*.name.distinct' => 'Os nomes dos campos devem ser únicos.',
+                'flat_fields.*.name.required' => 'O nome de cada campo é obrigatório.',
+            ];
+
+            $data = $model->attributesToArray();
+            $data['flat_fields'] = $model->flattenFields();
+
+            $validator = Validator::make($data, $rules, $messages);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+        });
+    }
+
+    /**
      * Retorna fields mas achatado - sem subarrays
      */
     public function flattenFields()
@@ -57,34 +99,5 @@ class FormDefinition extends Model
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($model) {
-            $rules = [
-                'name'        => 'required|string|max:255|unique:form_definitions,name,' . $model->id,
-                'group'       => 'required|string|max:255',
-                'description' => 'nullable|string|max:255',
-                'fields'      => 'required|array',
-                'all_fields.*.name' => 'required|string|distinct',
-            ];
-
-            $messages = [
-                'all_fields.*.name.distinct' => 'Os nomes dos campos devem ser únicos.',
-                'all_fields.*.name.required' => 'O nome de cada campo é obrigatório.',
-            ];    
-
-            $data = $model->attributesToArray();
-            $data['all_fields'] = $model->flattenFields();
-
-            $validator = Validator::make($data, $rules, $messages);
-
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
-        });
     }
 }
