@@ -199,7 +199,7 @@ php artisan forms:demo
 ]
 ```
 
-`FormDefinition::create($form);`
+    FormDefinition::create($form);
 
 
 2. **Gere o formulário na sua view:**
