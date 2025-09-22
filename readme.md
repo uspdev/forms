@@ -186,6 +186,19 @@ php artisan forms:demo
 ]
 ```
 
+* data 
+  
+  ```json
+  [
+    {
+      "name": "data",
+      "type": "date",
+      "label": "Campo de data",
+      "required": true
+    },
+  ]
+  ```
+
     FormDefinition::create($form);
 
 
@@ -249,11 +262,12 @@ OBS.: Os arquivos são armazenados em storage/app/formsubmissions/&lt;ano&gt;/id
 * disciplina-usp: campo tipo select que faz busca no replicado e retorna uma disciplina. nome do campo recomendado: coddis;
 * patrimonio-usp: campo tipo select que faz busca no replicado e retorna um bem patrimoniado. nome do campo recomendado: numpat;
 * local-usp: campo tipo select que faz busca no replicado e retorna um local da usp já formatado. nome do campo recomendado: codlocusp;
-* text: texto simples
-* email: valida campos email
-* select: precisa passar `options`
-* textarea:
-* file: pode passar `"accept" : ".pdf, image/*"`
+* data: data simples no formato dd/mm/aaaa;
+* text: texto simples (linha única);
+* email: valida campos email;
+* select: precisa passar `options`;
+* textarea: parágrafos;
+* file: pode passar `"accept" : ".pdf, image/*"`;
 
 ## Contribuindo
 
