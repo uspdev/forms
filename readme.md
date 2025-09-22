@@ -188,18 +188,18 @@ php artisan forms:demo
 
 * data 
   
-  ```json
-  [
-    {
-      "name": "data",
-      "type": "date",
-      "label": "Campo de data",
-      "required": true
-    },
-  ]
-  ```
+```json
+[
+  {
+    "name": "data",
+    "type": "date",
+    "label": "Campo de data",
+    "required": true
+  },
+]
+```
 
-    FormDefinition::create($form);
+`FormDefinition::create($form);`
 
 
 2. **Gere o formulário na sua view:**
