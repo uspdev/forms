@@ -23,4 +23,7 @@ return [
 
     # Quem pode realizar buscas: geralmente é o usuário logado
     'findGate' => 'user',
+
+    # Diretório para armazenamento dos arquivos .json que representam os formulários da aplicação
+    'forms_storage_dir' => env('FORM_STORAGE_DIR','storage/app/formsJson'),
 ];
