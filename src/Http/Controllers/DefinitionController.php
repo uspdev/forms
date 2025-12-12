@@ -102,19 +102,23 @@ class DefinitionController extends Controller
         
         $form_definitions = FormDefinition::all();
         $count = 1;
-
+        
         fwrite($json_file,"[\n");
         foreach($form_definitions as $form_definition)
         {
-            fwrite($json_file,json_encode($form_definition));
-            fwrite($json_file,",\n\n");
-            if($count == $form_definition->count() - 1){break;}
+            $encoded_json = json_encode($form_definition,JSON_PRETTY_PRINT);
+            $linhas = explode("\n",$encoded_json);
+            foreach($linhas as $linha)
+            {
+                fwrite($json_file,"\t" . $linha . "\n");
+            }
+            if($count < $form_definitions->count())
+            {
+                fwrite($json_file,",\n\n");
+            }
             $count++;
         }
         
-        $last_def = FormDefinition::find($count + 1);
-        fwrite($json_file,json_encode($last_def) . "\n");
-
         fwrite($json_file,"]");
 
         fclose($json_file);
