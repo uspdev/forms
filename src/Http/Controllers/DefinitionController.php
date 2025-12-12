@@ -125,4 +125,23 @@ class DefinitionController extends Controller
 
         return redirect()->route('form-definitions.index')->with('alert-success','Formulários exportados com sucesso!');
     }
+
+    public function export_definition(FormDefinition $formDefinition)
+    {
+        
+        $file_dir = base_path(config("uspdev-forms.forms_storage_dir"));
+        if(!is_dir($file_dir))
+        {
+            mkdir($file_dir,0777,true);
+        }
+        
+        $file_path = $file_dir . "/" . $formDefinition['name'] . ".json";
+        $json_file = fopen($file_path, "w");
+
+        fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT));
+        fclose($json_file);
+
+        return redirect()->route('form-definitions.index')->with('alert-success','Definição de '. $formDefinition['name'] .' exportada com sucesso!');
+
+    }
 }

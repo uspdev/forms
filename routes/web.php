@@ -11,6 +11,7 @@ Route::group(['prefix' => config('uspdev-forms.prefix'), 'middleware' => ['web']
     Route::get('definitions/create', [DefinitionController::class, 'create'])->name('form-definitions.create');
     Route::post('definitions', [DefinitionController::class, 'store'])->name('form-definitions.store');
     Route::get('definitions/export-all',[DefinitionController::class,'export_all'])->name('form-definitions.export-all');
+    Route::get('definitions/{formDefinition}/export',[DefinitionController::class, 'export_definition'])->name('form-definitions.export-definition');
     Route::get('definitions/{formDefinition}', [DefinitionController::class, 'show'])->name('form-definitions.show');
     Route::get('definitions/{formDefinition}/edit', [DefinitionController::class, 'edit'])->name('form-definitions.edit');
     Route::put('definitions/{formDefinition}', [DefinitionController::class, 'update'])->name('form-definitions.update');
