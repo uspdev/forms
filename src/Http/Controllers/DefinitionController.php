@@ -106,7 +106,7 @@ class DefinitionController extends Controller
         fwrite($json_file,"[\n");
         foreach($form_definitions as $form_definition)
         {
-            $encoded_json = json_encode($form_definition,JSON_PRETTY_PRINT);
+            $encoded_json = json_encode($form_definition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             $linhas = explode("\n",$encoded_json);
             foreach($linhas as $linha)
             {
@@ -138,7 +138,7 @@ class DefinitionController extends Controller
         $file_path = $file_dir . "/" . $formDefinition['name'] . ".json";
         $json_file = fopen($file_path, "w");
 
-        fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT));
+        fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         fclose($json_file);
 
         return redirect()->route('form-definitions.index')->with('alert-success','Definição de '. $formDefinition['name'] .' exportada com sucesso!');
