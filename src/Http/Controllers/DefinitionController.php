@@ -89,43 +89,6 @@ class DefinitionController extends Controller
         }
     }
 
-    public function export_all()
-    {
-        $file_dir = base_path(config("uspdev-forms.forms_storage_dir"));
-        if(!is_dir($file_dir))
-        {
-            mkdir($file_dir,0777,true);
-        }
-        $file_path = $file_dir . "/forms.json";
-
-        $json_file = fopen($file_path,"w");
-        
-        $form_definitions = FormDefinition::all();
-        $count = 1;
-        
-        fwrite($json_file,"[\n");
-        foreach($form_definitions as $form_definition)
-        {
-            $encoded_json = json_encode($form_definition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            $linhas = explode("\n",$encoded_json);
-            foreach($linhas as $linha)
-            {
-                fwrite($json_file,"\t" . $linha . "\n");
-            }
-            if($count < $form_definitions->count())
-            {
-                fwrite($json_file,",\n\n");
-            }
-            $count++;
-        }
-        
-        fwrite($json_file,"]");
-
-        fclose($json_file);
-
-        return redirect()->route('form-definitions.index')->with('alert-success','Formulários exportados com sucesso!');
-    }
-
     public function export_definition(FormDefinition $formDefinition)
     {
         
@@ -144,4 +107,16 @@ class DefinitionController extends Controller
         return redirect()->route('form-definitions.index')->with('alert-success','Definição de '. $formDefinition['name'] .' exportada com sucesso!');
 
     }
+
+    public function export_all()
+        {
+            $form_definitions = FormDefinition::all();
+            
+            foreach($form_definitions as $form_definition)
+            {
+                $this->export_definition($form_definition);
+            }
+    
+            return redirect()->route('form-definitions.index')->with('alert-success','Formulários exportados com sucesso!');
+        }
 }
