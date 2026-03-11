@@ -88,4 +88,35 @@ class DefinitionController extends Controller
                 ->with('alert-danger', 'Não foi possível excluir: ' . $e->getMessage());
         }
     }
+
+    public function export_definition(FormDefinition $formDefinition)
+    {
+        
+        $file_dir = base_path(config("uspdev-forms.forms_storage_dir"));
+        if(!is_dir($file_dir))
+        {
+            mkdir($file_dir,0777,true);
+        }
+        
+        $file_path = $file_dir . "/" . $formDefinition['name'] . ".json";
+        $json_file = fopen($file_path, "w");
+
+        fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        fclose($json_file);
+
+        return redirect()->route('form-definitions.index')->with('alert-success','Definição de '. $formDefinition['name'] .' exportada com sucesso!');
+
+    }
+
+    public function export_all()
+        {
+            $form_definitions = FormDefinition::all();
+            
+            foreach($form_definitions as $form_definition)
+            {
+                $this->export_definition($form_definition);
+            }
+    
+            return redirect()->route('form-definitions.index')->with('alert-success','Formulários exportados com sucesso!');
+        }
 }
