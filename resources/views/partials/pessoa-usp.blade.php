@@ -28,27 +28,36 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  // Função auto-invocada para inicializar o Select2 com verificação de jQuery
+  (function() {
+    function scheduleInitPessoa() {
+      let attemptsPessoa = 1;
+      const maxAttemptsPessoa = 50; // Tenta por 5 segundos (50 * 100ms)
 
-    let attemptsPessoa = 1;
-    const maxAttemptsPessoa = 50; // Tenta por 5 segundos (50 * 100ms)
-
-    const intervalIdPessoa = setInterval(() => {
-      if (window.jQuery) {
-        clearInterval(intervalIdPessoa);
-        console.log("Select carregou após " + attemptsPessoa + " tentativas.");
-        initSelect2Pessoa();
-      } else if (attemptsPessoa >= maxAttemptsPessoa) {
-        clearInterval(intervalIdPessoa);
-        console.error("jQuery não carregou após várias tentativas.");
-      }
-      attemptsPessoa++;
-    }, 100);
-
-  });
+      const intervalIdPessoa = setInterval(() => {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
+          clearInterval(intervalIdPessoa);
+          initSelect2Pessoa();
+        } else if (attemptsPessoa >= maxAttemptsPessoa) {
+          clearInterval(intervalIdPessoa);
+          console.error("jQuery não carregou após várias tentativas.");
+        }
+        attemptsPessoa++;
+      }, 100);
+    }
+    // Inicializa o Select2 quando o DOM estiver pronto ou quando um modal for aberto
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleInitPessoa);
+    } else {
+      scheduleInitPessoa();
+    }
+  })();
 
   function initSelect2Pessoa() {
     var $oSelect2Pessoa = $('#{{ $field['id'] }}');
+
+    // Define o dropdownParent para garantir que o Select2 funcione corretamente dentro de modais
+    var $modalParentPessoa = $oSelect2Pessoa.closest('.modal');
 
     $oSelect2Pessoa.select2({
       ajax: {
@@ -61,12 +70,17 @@
       minimumInputLength: 4,
       theme: 'bootstrap4',
       width: 'resolve',
-      language: 'pt-BR'
+      language: 'pt-BR',
+      // Garante que o dropdown seja anexado ao modal correto, ou ao body se não estiver em um modal
+      dropdownParent: $modalParentPessoa.length ? $modalParentPessoa : $(document.body)
     });
 
     // Coloca o foco no campo de busca ao abrir o Select2
-    $(document).on('select2:open', () => {
-      document.querySelector('.select2-search__field').focus();
+    $oSelect2Pessoa.off('select2:open').on('select2:open', function() {
+      var searchField = document.querySelector('.select2-container--open .select2-search__field');
+      if (searchField) {
+        searchField.focus();
+      }
     });
   }
 </script>
