@@ -23,67 +23,20 @@
 </div>
 
 <script>
-  // Função auto-invocada para inicializar o Select2 com verificação de jQuery
-  (function() {
-    function scheduleInitPatr() {
-      let attemptsPatr = 1;
-      const maxAttemptsPatr = 50; // Tenta por 5 segundos (50 * 100ms)
+  @include('uspdev-forms::partials.scripts.select2-usp-helper')
 
-      const intervalIdPatr = setInterval(() => {
-        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
-          clearInterval(intervalIdPatr);
-          initSelect2Patr();
-        } else if (attemptsPatr >= maxAttemptsPatr) {
-          clearInterval(intervalIdPatr);
-          console.error("jQuery não carregou após várias tentativas.");
-        }
-        attemptsPatr++;
-      }, 100);
-    }
-    // Inicializa o Select2 quando o DOM estiver pronto ou quando um modal for aberto
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', scheduleInitPatr);
-    } else {
-      scheduleInitPatr();
-    }
-  })();
-
-  function initSelect2Patr() {
-    var $oSelect2Patr = $('#{{ $field['id'] }}');
-
-    // Define o dropdownParent para garantir que o Select2 funcione corretamente dentro de modais
-    var $modalParentPatr = $oSelect2Patr.closest('.modal');
-
-    $oSelect2Patr.select2({
-      ajax: {
-        url: '{{ route('form.find.patrimonio') }}',
-        dataType: 'json',
-        delay: 1000,
-        processResults: function(data) {
-          if (data.results.original.results) {
-            return {
-              results: data.results.original.results
-            };
-          }
-          return data;
-        }
-      },
-      allowClear: true,
-      placeholder: 'Digite um número de patrimônio...',
-      minimumInputLength: 9,
-      theme: 'bootstrap4',
-      width: 'resolve',
-      language: 'pt-BR',
-      // Garante que o dropdown seja anexado ao modal correto, ou ao body se não estiver em um modal
-      dropdownParent: $modalParentPatr.length ? $modalParentPatr : $(document.body)
-    });
-
-    // Coloca o foco no campo de busca ao abrir o Select2
-    $oSelect2Patr.off('select2:open').on('select2:open', function() {
-      var searchField = document.querySelector('.select2-container--open .select2-search__field');
-      if (searchField) {
-        searchField.focus();
+  window.uspdevFormsSelect2.initOnLoad({
+    selector: '#{{ $field['id'] }}',
+    url: '{{ route('form.find.patrimonio') }}',
+    placeholder: 'Digite um número de patrimônio...',
+    minimumInputLength: 9,
+    processResults: function(data) {
+      if (data.results && data.results.original && data.results.original.results) {
+        return {
+          results: data.results.original.results
+        };
       }
-    });
-  }
+      return data;
+    }
+  });
 </script>

@@ -27,58 +27,12 @@
 </div>
 
 <script>
-  // Função auto-invocada para inicializar o Select2 com verificação de jQuery
-  (function() {
-    function scheduleInitLocal() {
-      let attemptsLocal = 1;
-      const maxAttemptsLocal = 50; // Tenta por 5 segundos (50 * 100ms)
+  @include('uspdev-forms::partials.scripts.select2-usp-helper')
 
-      const intervalIdLocal = setInterval(() => {
-        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
-          clearInterval(intervalIdLocal);
-          initSelect2Local();
-        } else if (attemptsLocal >= maxAttemptsLocal) {
-          clearInterval(intervalIdLocal);
-          console.error("jQuery não carregou após várias tentativas.");
-        }
-        attemptsLocal++;
-      }, 100);
-    }
-    // Inicializa o Select2 quando o DOM estiver pronto ou quando um modal for aberto
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', scheduleInitLocal);
-    } else {
-      scheduleInitLocal();
-    }
-  })();
-
-  function initSelect2Local() {
-    var $oSelect2Local = $('#{{ $field['id'] }}');
-
-    // Define o dropdownParent para garantir que o Select2 funcione corretamente dentro de modais
-    var $modalParentLocal = $oSelect2Local.closest('.modal');
-
-    $oSelect2Local.select2({
-      ajax: {
-        url: '{{ route('form.find.local') }}',
-        dataType: 'json',
-        delay: 1000,
-      },
-      allowClear: true,
-      placeholder: 'Digite um número de local...',
-      minimumInputLength: 3,
-      theme: 'bootstrap4',
-      width: 'resolve',
-      language: 'pt-BR',
-      dropdownParent: $modalParentLocal.length ? $modalParentLocal : $(document.body)
-    });
-
-    // Coloca o foco no campo de busca ao abrir o Select2
-    $oSelect2Local.off('select2:open').on('select2:open', function() {
-      var searchField = document.querySelector('.select2-container--open .select2-search__field');
-      if (searchField) {
-        searchField.focus();
-      }
-    });
-  }
+  window.uspdevFormsSelect2.initOnLoad({
+    selector: '#{{ $field['id'] }}',
+    url: '{{ route('form.find.local') }}',
+    placeholder: 'Digite um número de local...',
+    minimumInputLength: 3,
+  });
 </script>
