@@ -27,27 +27,36 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  // Função auto-invocada para inicializar o Select2 com verificação de jQuery
+  (function() {
+    function scheduleInitLocal() {
+      let attemptsLocal = 1;
+      const maxAttemptsLocal = 50; // Tenta por 5 segundos (50 * 100ms)
 
-    let attemptsLocal = 1;
-    const maxAttemptsLocal = 50; // Tenta por 5 segundos (50 * 100ms)
-
-    const intervalIdLocal = setInterval(() => {
-      if (window.jQuery) {
-        clearInterval(intervalIdLocal);
-        console.log("Select2 local carregou após " + attemptsLocal + " tentativas.");
-        initSelect2Local();
-      } else if (attemptsLocal >= maxAttemptsLocal) {
-        clearInterval(intervalIdLocal);
-        console.error("jQuery local não carregou após várias tentativas.");
-      }
-      attemptsLocal++;
-    }, 100);
-
-  });
+      const intervalIdLocal = setInterval(() => {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
+          clearInterval(intervalIdLocal);
+          initSelect2Local();
+        } else if (attemptsLocal >= maxAttemptsLocal) {
+          clearInterval(intervalIdLocal);
+          console.error("jQuery não carregou após várias tentativas.");
+        }
+        attemptsLocal++;
+      }, 100);
+    }
+    // Inicializa o Select2 quando o DOM estiver pronto ou quando um modal for aberto
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleInitLocal);
+    } else {
+      scheduleInitLocal();
+    }
+  })();
 
   function initSelect2Local() {
     var $oSelect2Local = $('#{{ $field['id'] }}');
+
+    // Define o dropdownParent para garantir que o Select2 funcione corretamente dentro de modais
+    var $modalParentLocal = $oSelect2Local.closest('.modal');
 
     $oSelect2Local.select2({
       ajax: {
@@ -60,12 +69,16 @@
       minimumInputLength: 3,
       theme: 'bootstrap4',
       width: 'resolve',
-      language: 'pt-BR'
+      language: 'pt-BR',
+      dropdownParent: $modalParentLocal.length ? $modalParentLocal : $(document.body)
     });
 
-    // não precisa repetir para todos os select2.
-    $(document).on('select2:open', function() {
-      document.querySelector('.select2-search__field').focus();
+    // Coloca o foco no campo de busca ao abrir o Select2
+    $oSelect2Local.off('select2:open').on('select2:open', function() {
+      var searchField = document.querySelector('.select2-container--open .select2-search__field');
+      if (searchField) {
+        searchField.focus();
+      }
     });
   }
 </script>
