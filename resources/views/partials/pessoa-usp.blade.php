@@ -28,45 +28,12 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  @include('uspdev-forms::partials.scripts.select2-usp-helper')
 
-    let attemptsPessoa = 1;
-    const maxAttemptsPessoa = 50; // Tenta por 5 segundos (50 * 100ms)
-
-    const intervalIdPessoa = setInterval(() => {
-      if (window.jQuery) {
-        clearInterval(intervalIdPessoa);
-        console.log("Select carregou após " + attemptsPessoa + " tentativas.");
-        initSelect2Pessoa();
-      } else if (attemptsPessoa >= maxAttemptsPessoa) {
-        clearInterval(intervalIdPessoa);
-        console.error("jQuery não carregou após várias tentativas.");
-      }
-      attemptsPessoa++;
-    }, 100);
-
+  window.uspdevFormsSelect2.initOnLoad({
+    selector: '#{{ $field['id'] }}',
+    url: '{{ route('form.find.pessoa') }}',
+    placeholder: 'Digite o nome ou codpes..',
+    minimumInputLength: 4,
   });
-
-  function initSelect2Pessoa() {
-    var $oSelect2Pessoa = $('#{{ $field['id'] }}');
-
-    $oSelect2Pessoa.select2({
-      ajax: {
-        url: '{{ route('form.find.pessoa') }}',
-        dataType: 'json',
-        delay: 1000
-      },
-      allowClear: true,
-      placeholder: 'Digite o nome ou codpes..',
-      minimumInputLength: 4,
-      theme: 'bootstrap4',
-      width: 'resolve',
-      language: 'pt-BR'
-    });
-
-    // Coloca o foco no campo de busca ao abrir o Select2
-    $(document).on('select2:open', () => {
-      document.querySelector('.select2-search__field').focus();
-    });
-  }
 </script>

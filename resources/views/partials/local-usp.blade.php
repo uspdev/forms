@@ -27,45 +27,12 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  @include('uspdev-forms::partials.scripts.select2-usp-helper')
 
-    let attemptsLocal = 1;
-    const maxAttemptsLocal = 50; // Tenta por 5 segundos (50 * 100ms)
-
-    const intervalIdLocal = setInterval(() => {
-      if (window.jQuery) {
-        clearInterval(intervalIdLocal);
-        console.log("Select2 local carregou após " + attemptsLocal + " tentativas.");
-        initSelect2Local();
-      } else if (attemptsLocal >= maxAttemptsLocal) {
-        clearInterval(intervalIdLocal);
-        console.error("jQuery local não carregou após várias tentativas.");
-      }
-      attemptsLocal++;
-    }, 100);
-
+  window.uspdevFormsSelect2.initOnLoad({
+    selector: '#{{ $field['id'] }}',
+    url: '{{ route('form.find.local') }}',
+    placeholder: 'Digite um número de local...',
+    minimumInputLength: 3,
   });
-
-  function initSelect2Local() {
-    var $oSelect2Local = $('#{{ $field['id'] }}');
-
-    $oSelect2Local.select2({
-      ajax: {
-        url: '{{ route('form.find.local') }}',
-        dataType: 'json',
-        delay: 1000,
-      },
-      allowClear: true,
-      placeholder: 'Digite um número de local...',
-      minimumInputLength: 3,
-      theme: 'bootstrap4',
-      width: 'resolve',
-      language: 'pt-BR'
-    });
-
-    // não precisa repetir para todos os select2.
-    $(document).on('select2:open', function() {
-      document.querySelector('.select2-search__field').focus();
-    });
-  }
 </script>

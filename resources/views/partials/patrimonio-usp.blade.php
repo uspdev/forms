@@ -23,53 +23,20 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  @include('uspdev-forms::partials.scripts.select2-usp-helper')
 
-    let attemptsPatr = 1;
-    const maxAttemptsPatr = 50; // Tenta por 5 segundos (50 * 100ms)
-
-    const intervalIdPatr = setInterval(() => {
-      if (window.jQuery) {
-        clearInterval(intervalIdPatr);
-        console.log("Select2 carregou após " + attemptsPatr + " tentativas.");
-        initSelect2Patr();
-      } else if (attemptsPatr >= maxAttemptsPatr) {
-        clearInterval(intervalIdPatr);
-        console.error("jQuery não carregou após várias tentativas.");
+  window.uspdevFormsSelect2.initOnLoad({
+    selector: '#{{ $field['id'] }}',
+    url: '{{ route('form.find.patrimonio') }}',
+    placeholder: 'Digite um número de patrimônio...',
+    minimumInputLength: 9,
+    processResults: function(data) {
+      if (data.results && data.results.original && data.results.original.results) {
+        return {
+          results: data.results.original.results
+        };
       }
-      attemptsPatr++;
-    }, 100);
-
+      return data;
+    }
   });
-
-  function initSelect2Patr() {
-    var $oSelect2Patr = $('#{{ $field['id'] }}');
-
-    $oSelect2Patr.select2({
-      ajax: {
-        url: '{{ route('form.find.patrimonio') }}',
-        dataType: 'json',
-        delay: 1000,
-        processResults: function(data) {
-          if (data.results.original.results) {
-            return {
-              results: data.results.original.results
-            };
-          }
-          return data;
-        }
-      },
-      allowClear: true,
-      placeholder: 'Digite um número de patrimônio...',
-      minimumInputLength: 9,
-      theme: 'bootstrap4',
-      width: 'resolve',
-      language: 'pt-BR'
-    });
-
-    // Coloca o foco no campo de busca ao abrir o Select2
-    $(document).on('select2:open', () => {
-      document.querySelector('.select2-search__field').focus();
-    });
-  }
 </script>
