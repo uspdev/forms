@@ -44,6 +44,7 @@
                 @include('uspdev-forms::definition.partials.show-btn')
                 @include('uspdev-forms::definition.partials.editar-btn')
                 @include('uspdev-forms::definition.partials.delete-btn')
+                @include('uspdev-forms::definition.partials.exportdefinition-btn')
                 @includeWhen(
                     $formDefinition->formSubmissions()->onlyTrashed()->count() > 0,
                     'uspdev-forms::definition.partials.delete-trashed-btn')
@@ -55,3 +56,4 @@
     </div>
   </div>
 @endsection
+@include('uspdev-forms::definition.partials.globalexport-btn')
