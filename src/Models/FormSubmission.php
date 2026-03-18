@@ -60,4 +60,120 @@ class FormSubmission extends Model
         });
     }
 
+    /**
+     * Renderiza o HTML de visualização do formulário enviado
+     * 
+     * @param bool $longName Se true, exibe nome completo de campos como disciplina-usp (código + nome)
+     * @param bool $isAdmin Se true, exibe e destaca campos administrativos (sem label)
+     * @return string HTML renderizado com os dados do formulário
+     */
+    public function showHtml($longName = false, $isAdmin = false): string
+    {
+        $definition = $this->formDefinition;
+        if (!$definition) {
+            return '';
+        }
+
+        $fields = '';
+        $hasAdminFields = false;
+
+        foreach ($definition->fields as $field) {
+            if (array_is_list($field)) {
+                // agrupando campos na mesma linha: igual para bs4 e bs5
+                $row = '';
+                foreach ($field as $f) {
+                    $isAdminField = $this->isAdminField($f);
+                    if ($isAdminField && !$isAdmin) {
+                        continue;
+                    }
+
+                    if ($isAdminField) {
+                        $hasAdminFields = true;
+                    }
+
+                    $label =  $f['label'] ?? '';
+                    $content = '';
+                    $content .= $this->renderField($f, true, $isAdminField);
+
+                    $row .= '<div class="col">' . $content . '</div>';
+                }
+
+                if (!empty($row)) {
+                    $fields .= '<div class="row g-2 mb-3">' . $row . '</div>';
+                }
+            } else {
+                // a linha possui um campo somente
+                $isAdminField = $this->isAdminField($field);
+                if ($isAdminField && !$isAdmin) {
+                    continue;
+                }
+
+                if ($isAdminField) {
+                    $hasAdminFields = true;
+                }
+
+                $label =  $field['label'] ?? '';
+                $content = '';
+                if ($label !== '') {
+                    $content .= '<strong class="d-block mb-1">' . e($label) . '</strong>';
+                }
+                $content .= $this->renderField($field, true, $isAdminField);
+
+                $fields .= '<div class="mb-3">' . $content . '</div>';
+            }
+        }
+
+      
+        return $fields;
+    }
+
+    /**
+     * Campos sem label são tratados como administrativos.
+     */
+    protected function isAdminField(array $field): bool
+    {
+        return empty(trim((string) ($field['label'] ?? '')));
+    }
+
+    /**
+     * Renderiza um campo individual no modo visualização
+     * 
+     * @param array $field Configuração do campo
+     * @param bool $longName Se true, exibe informações completas do campo
+     * @param bool $isAdminField Se true, aplica destaque visual para campo administrativo
+     * @return string HTML renderizado do campo
+     */
+    protected function renderField($field, $longName = false, $isAdminField = false): string
+    {
+        // tipos de entradas do form em modo visualização
+        $types = ['select', 'checkbox', 'time', 'date', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
+
+        $fieldName = $field['name'] ?? 'field';
+        $field['id'] = 'uspdev-forms-' . $fieldName;
+
+        if (in_array($field['type'], $types)) {
+            $viewName = $field['type'] . '-view';
+            $html = view('uspdev-forms::partials.' . $viewName, [
+                'field' => $field,
+                'submission' => $this,
+                'longName' => $longName,
+            ])->render();
+        } else {
+            $html = view('uspdev-forms::partials.default-view', [
+                'field' => $field,
+                'submission' => $this,
+            ])->render();
+        }
+
+        if ($isAdminField) {
+            $adminFieldName = e((string) $fieldName);
+            $html = '<div class="border border-danger rounded p-2">'
+                . '<div class="small text-danger font-weight-bold mb-1">' . $adminFieldName . '</div>'
+                . $html
+                . '</div>';
+        }
+
+        return $html;
+    }
+
 }
