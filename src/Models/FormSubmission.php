@@ -75,7 +75,7 @@ class FormSubmission extends Model
         }
 
         $fields = '';
-        $hasAdminFields = false;
+        $adminFields = '';
 
         foreach ($definition->fields as $field) {
             if (array_is_list($field)) {
@@ -88,11 +88,15 @@ class FormSubmission extends Model
                     }
 
                     if ($isAdminField) {
-                        $hasAdminFields = true;
+                        $adminFields .= $this->renderAdminField($f);
+                        continue;
                     }
 
-                    $label =  $f['label'] ?? '';
+                    $label = trim((string) ($f['label'] ?? ''));
                     $content = '';
+                    if ($label !== '') {
+                        $content .= '<strong class="d-block mb-1">' . e($label) . '</strong>';
+                    }
                     $content .= $this->renderField($f, true, $isAdminField);
 
                     $row .= '<div class="col">' . $content . '</div>';
@@ -109,22 +113,49 @@ class FormSubmission extends Model
                 }
 
                 if ($isAdminField) {
-                    $hasAdminFields = true;
+                    $adminFields .= $this->renderAdminField($field);
+                    continue;
                 }
 
-                $label =  $field['label'] ?? '';
+                $label = trim((string) ($field['label'] ?? ''));
                 $content = '';
                 if ($label !== '') {
                     $content .= '<strong class="d-block mb-1">' . e($label) . '</strong>';
                 }
-                $content .= $this->renderField($field, true, $isAdminField);
+                $content .= $this->renderField($field, true);
 
                 $fields .= '<div class="mb-3">' . $content . '</div>';
             }
         }
 
+        if ($isAdmin && !empty($adminFields)) {
+            $fields .= '<div class="border border-danger rounded p-2 mb-3">'
+                . $adminFields
+                . '</div>';
+        }
+
       
         return $fields;
+    }
+
+    /**
+     * Renderiza campo administrativo em formato compacto: nome: valor
+     */
+    protected function renderAdminField(array $field): string
+    {
+        $fieldName = $field['name'];
+        $value = $this->data[$fieldName] ?? null;
+
+
+        if ($value === null || $value === '') {
+            $value = 'n/a';
+        }
+
+        return '<div class="small mb-1"><span class="text-danger font-weight-bold">'
+            . e($fieldName)
+            . ':</span> '
+            . e((string) $value)
+            . '</div>';
     }
 
     /**
@@ -140,10 +171,9 @@ class FormSubmission extends Model
      * 
      * @param array $field Configuração do campo
      * @param bool $longName Se true, exibe informações completas do campo
-     * @param bool $isAdminField Se true, aplica destaque visual para campo administrativo
      * @return string HTML renderizado do campo
      */
-    protected function renderField($field, $longName = false, $isAdminField = false): string
+    protected function renderField($field, $longName = false): string
     {
         // tipos de entradas do form em modo visualização
         $types = ['select', 'checkbox', 'time', 'date', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
@@ -164,15 +194,6 @@ class FormSubmission extends Model
                 'submission' => $this,
             ])->render();
         }
-
-        if ($isAdminField) {
-            $adminFieldName = e((string) $fieldName);
-            $html = '<div class="border border-danger rounded p-2">'
-                . '<div class="small text-danger font-weight-bold mb-1">' . $adminFieldName . '</div>'
-                . $html
-                . '</div>';
-        }
-
         return $html;
     }
 
