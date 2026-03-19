@@ -10,6 +10,7 @@
         </button>
       </div>
       <div class="modal-body">
+        <!-- longName ativo, mostra o codigo e o nome dos campos *-usp -->
         {!! $submission->showHtml(true, $form->admin ?? false) !!}
       </div>
       <div class="modal-footer">

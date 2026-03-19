@@ -12,8 +12,16 @@
   } else {
       $title = $codlocusp;
   }
+
+  if ($longName ?? false) {
+      // Modo longo: código + nome completo do local
+      $display = $title;
+  } else {
+      // Modo curto: apenas o código (comportamento padrão)
+      $display = $codlocusp;
+  }
 @endphp
 
 <span title="{{ $title }}">
-  {{ $codlocusp }}
+  {{ $display }}
 </span>
