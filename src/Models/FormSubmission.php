@@ -176,7 +176,7 @@ class FormSubmission extends Model
     protected function renderField($field, $longName = false): string
     {
         // tipos de entradas do form em modo visualização
-        $types = ['select', 'checkbox', 'time', 'date', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
+        $types = ['checkbox', 'time', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
 
         $fieldName = $field['name'] ?? 'field';
         $field['id'] = 'uspdev-forms-' . $fieldName;
