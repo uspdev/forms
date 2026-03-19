@@ -97,7 +97,7 @@ class FormSubmission extends Model
                     if ($label !== '') {
                         $content .= '<strong class="d-block mb-1">' . e($label) . '</strong>';
                     }
-                    $content .= $this->renderField($f, true, $isAdminField);
+                    $content .= $this->renderField($f, $longName);
 
                     $row .= '<div class="col">' . $content . '</div>';
                 }
@@ -122,7 +122,7 @@ class FormSubmission extends Model
                 if ($label !== '') {
                     $content .= '<strong class="d-block mb-1">' . e($label) . '</strong>';
                 }
-                $content .= $this->renderField($field, true);
+                $content .= $this->renderField($field, $longName);
 
                 $fields .= '<div class="mb-3">' . $content . '</div>';
             }
