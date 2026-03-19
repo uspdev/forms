@@ -37,6 +37,9 @@
               @include('uspdev-forms::submission.partials.edit-btn')
               <div class="px-1"></div>
               @include('uspdev-forms::submission.partials.delete-btn')
+              <div class="px-1"></div>
+              @include('uspdev-forms::submission.partials.show-btn')
+              @include('uspdev-forms::submission.partials.show-form-modal')
             </div>
           </td>
         </tr>
