@@ -21,7 +21,7 @@ class EventServiceProvider extends ServiceProvider
         Event::listen(function (UspThemeParseKey $event) {
             if (isset($event->item['key']) && $event->item['key'] == 'uspdev-forms') {
                 $event->item = [
-                    'text' => '<span class="text-danger"><i class="fas fa-clipboard-list"></i></span>',
+                    'text' => '<span class="text-danger"><i class="fas fa-clipboard-list"></i> Forms</span>',
                     'url' => route('form-definitions.index'),
                     'title' => 'Formulários',
                     'can' => config('uspdev-forms.adminGate'), // controla permissão via Gate
