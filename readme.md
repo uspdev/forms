@@ -44,6 +44,22 @@ Popula o banco com um formulário de demonstração com vários tipos de campos,
 ```bash
 php artisan forms:demo
 ```
+
+## Sincronização de formulários
+
+Sincroniza definições de formulários em `.json` para a tabela `form_definitions` de forma idempotente (create ou update).
+
+```bash
+php artisan forms:sync
+```
+
+Por padrão, o comando lê os arquivos do diretório configurado em `uspdev-forms.forms_storage_dir`.
+
+Opcionalmente, você pode informar outro diretório:
+
+```bash
+php artisan forms:sync --path=storage/app/formsJson
+```
     
 ## Uso
 
