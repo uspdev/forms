@@ -55,5 +55,5 @@
       </table>
     </div>
   </div>
-@endsection
 @include('uspdev-forms::definition.partials.globalexport-btn')
+@endsection
