@@ -280,10 +280,35 @@ OBS.: Os arquivos são armazenados em storage/app/formsubmissions/&lt;ano&gt;/id
 * local-usp: campo tipo select que faz busca no replicado e retorna um local da usp já formatado. nome do campo recomendado: codlocusp;
 * data: data simples no formato dd/mm/aaaa;
 * text: texto simples (linha única);
+  * pode passar `"maxlength": 100` para limitar a quantidade de caracteres;
+* number: campo numérico;
+  * pode passar `"min"`, `"max"` e `"step"` para definir limites e incremento;
 * email: valida campos email;
 * select: precisa passar `options`;
 * textarea: parágrafos;
 * file: pode passar `"accept" : ".pdf, image/*"`;
+
+### Atributos adicionais por campo
+
+#### width para todos os campos
+
+O atributo `width` define a largura do campo no grid do Bootstrap (`col-1` até `col-12`).
+
+```json
+{
+  "type": "text",
+  "name": "nome",
+  "width": 6
+}
+```
+
+HTML gerado:
+
+```html
+<div class="col-6">
+  <input type="text" name="nome">
+</div>
+```
 
 ## Contribuindo
 
