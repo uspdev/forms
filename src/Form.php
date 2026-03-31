@@ -253,6 +253,7 @@ class Form
      */
     public function generateHtml(?string $formName = null, $formSubmission = null)
     {
+        // pega  pela definição
         if (!($this->definition = $this->getDefinition($formName ?? $this->name)) && !($this->definition = $formSubmission->formDefinition)) {
             return null;
         }
@@ -263,11 +264,27 @@ class Form
                 // agrupando campos na mesma linha: igual para bs4 e bs5
                 $fields .= '<div class="row">';
                 foreach ($field as $f) {
-                    $fields .= '<div class="col">' . $this->generateField($f, $formSubmission) . '</div>';
+                    $colClass = 'col';
+                    if (isset($f['width']) && is_numeric($f['width'])) {
+                        $width = (int) $f['width'];
+                        if ($width >= 1 && $width <= 12) {
+                            $colClass = 'col-' . $width;
+                        }
+                    }
+
+                    $fields .= '<div class="' . $colClass . '">' . $this->generateField($f, $formSubmission) . '</div>';
                 }
                 $fields .= '</div>';
             } else {
                 // a linha possui um campo somente
+                if (isset($field['width']) && is_numeric($field['width'])) {
+                    $width = (int) $field['width'];
+                    if ($width >= 1 && $width <= 12) {
+                        $fields .= '<div class="col-' . $width . '">' . $this->generateField($field, $formSubmission) . '</div>';
+                        continue;
+                    }
+                }
+
                 $fields .= $this->generateField($field, $formSubmission);
             }
         }
