@@ -9,9 +9,7 @@
 <div class="card">
     <div class="card-header h4 card-header-sticky d-flex justify-content-between align-items-center">
       <div>
-        <span class="text-danger">USPdev forms</span> >
-        Definições
-        <a href="{{ route('form-definitions.create') }}" class="btn btn-sm btn-primary">Nova Definição</a>
+        <span class="text-danger">Definition Backups</span>
       </div>
       <div>
         @include('uspdev-forms::partials.ajuda-modal')
@@ -23,7 +21,6 @@
           <tr>
             <th>Nome</th>
             <th>Grupo</th>
-            <th>Descrição</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -32,27 +29,15 @@
             <tr>
               <td>
                 {{ $formDefinition->name }}
-                <span class="badge badge-primary badge-pill" title="Submissões">
-                  {{ $formDefinition->formSubmissions->count() }}
-                </span>
-                <span class="badge badge-danger badge-pill" title="Submissões excluídas">
-                  {{ $formDefinition->formSubmissions()->onlyTrashed()->count() }}
+                <span class="badge badge-warning badge-pill" title="Backups existentes">
+                  {{ count(array_filter(scandir(config('uspdev-forms.forms_storage_dir')), fn($filename) => str_contains($filename,$formDefinition->name))) }}
                 </span>
               </td>
               <td>
                 {{ $formDefinition->group }}
               </td>
-              <td>
-                {{ $formDefinition->description }}
-              </td>
-              <td class="d-flex justify-content-start">
-                @include('uspdev-forms::definition.partials.show-btn')
-                @include('uspdev-forms::definition.partials.editar-btn')
-                @include('uspdev-forms::definition.partials.delete-btn')
+              <td class="d-flex justify-content-start align-item-centered">
                 @include('uspdev-forms::definition.partials.bckpgen-btn')
-                @includeWhen(
-                    $formDefinition->formSubmissions()->onlyTrashed()->count() > 0,
-                    'uspdev-forms::definition.partials.delete-trashed-btn')
               </td>
             </tr>
           @endforeach

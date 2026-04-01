@@ -14,12 +14,14 @@ class DefinitionController extends Controller
         $this->middleware('can:' . config('uspdev-forms.adminGate'));
     }
 
+
     public function index()
     {
         \UspTheme::activeUrl(route('form-definitions.index'));
         
         $formDefinitions = FormDefinition::all();
-        return view('uspdev-forms::definition.index', compact('formDefinitions'));
+        $activeTab = 'index';
+        return view('uspdev-forms::definition.index', compact('formDefinitions','activeTab'));
     }
 
     public function show(FormDefinition $formDefinition)
@@ -89,34 +91,43 @@ class DefinitionController extends Controller
         }
     }
 
-    public function export_definition(FormDefinition $formDefinition)
+    public function backup_def(FormDefinition $formDefinition)
     {
         
-        $file_dir = base_path(config("uspdev-forms.forms_storage_dir"));
+        $file_dir = config("uspdev-forms.forms_storage_dir");
         if(!is_dir($file_dir))
         {
             mkdir($file_dir,0777,true);
         }
         
-        $file_path = $file_dir . "/" . $formDefinition['name'] . ".json";
+        $file_path = $file_dir . "/" . $formDefinition['name'] . now()->format('Y-m-d_H-i-s') . ".json";
         $json_file = fopen($file_path, "w");
 
         fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         fclose($json_file);
 
-        return redirect()->route('form-definitions.index')->with('alert-success','Definição de '. $formDefinition['name'] .' exportada com sucesso!');
+        return redirect()->back()->with('alert-success','Backup de: '. $formDefinition['name'] .' gerado com sucesso em: ' . now() . '!');
 
     }
 
-    public function export_all()
+    public function backup_all()
         {
             $form_definitions = FormDefinition::all();
             
             foreach($form_definitions as $form_definition)
             {
-                $this->export_definition($form_definition);
+                $this->backup_def($form_definition);
             }
     
-            return redirect()->route('form-definitions.index')->with('alert-success','Formulários exportados com sucesso!');
+            return redirect()->back()->with('alert-success','Backups gerados em: ' . now() . ' com sucesso!');
         }
+    
+    public function backups_index()
+    {
+        \UspTheme::activeUrl(route('form-definitions.backups'));
+
+        $activeTab = 'backup';
+        $formDefinitions = FormDefinition::all();
+        return view('uspdev-forms::definition.backup', compact('activeTab','formDefinitions'));
+    }
 }
