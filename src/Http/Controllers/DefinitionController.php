@@ -20,6 +20,7 @@ class DefinitionController extends Controller
         \UspTheme::activeUrl(route('form-definitions.index'));
         
         $formDefinitions = FormDefinition::all();
+        // Inidica a aba de 'index' como ativa na view
         $activeTab = 'index';
         return view('uspdev-forms::definition.index', compact('formDefinitions','activeTab'));
     }
@@ -100,7 +101,7 @@ class DefinitionController extends Controller
             mkdir($file_dir,0777,true);
         }
         
-        $file_path = $file_dir . "/" . $formDefinition['name'] . '@' . now()->format('d-m-Y_H:i:s') . ".json";
+        $file_path = $file_dir . "/" . $formDefinition['name'] . '@' . now()->format('d-m-Y_H-i-s') . ".json";
         $json_file = fopen($file_path, "w");
 
         fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -133,26 +134,30 @@ class DefinitionController extends Controller
 
     public function list_backups(FormDefinition $formDefinition)
     {
+        // Pega todos os backups existentes e filtra pelo nome (relacionados à $formDefinition->name)
         $bckp_files = scandir(config('uspdev-forms.forms_storage_dir'));
         $bckp_files = array_filter($bckp_files, function($filename) use ($formDefinition) { return str_contains($filename,$formDefinition->name); });
             
         $backup_data = [];
 
+        // Percorre todos os backups da definition, recuperando a data de criação e a data da última alteração
         foreach($bckp_files as $filename)
         {
-            [$name, $created_time] = explode('@',$filename);
-            $created_time = explode('.',$created_time);
-            $created_time = $created_time[0];
-
-            $created_time = str_replace('-','/',$created_time);
-            $created_time = str_replace('_',' - ',$created_time);
+            $created_time = explode('@',$filename)[1];
+            $created_time = explode('.',$created_time)[0];
             
+            $last_mod_time = date('d-m-Y_H-i-s',filemtime(config('uspdev-forms.forms_storage_dir') .'/'.$filename));
 
-            $last_mod_time = date('d/m/Y - H:i:s',filemtime(config('uspdev-forms.forms_storage_dir') .'/'.$filename));
-
+            // Grava no formato: tempo_criado => ultima_mod
             $backup_data[$created_time] = $last_mod_time;
         }
-
+        dd($backup_data);
         return view('uspdev-forms::definition.backup-list', ['formDefinition' => $formDefinition, 'backup_data' => $backup_data]);
+    }
+
+    public function restore_backup(FormDefinition $definition, $creation_date)
+    {
+        $filename = $definition->name . $creation_date;
+        dd($filename);
     }
 }

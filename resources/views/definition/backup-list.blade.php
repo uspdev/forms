@@ -31,6 +31,7 @@
                 {{ $updt_time }}
               </td>
               <td class="d-flex justify-content-start align-item-centered">
+                @include('uspdev-forms::definition.partials.restore-btn')
               </td>
             </tr>
           @endforeach
