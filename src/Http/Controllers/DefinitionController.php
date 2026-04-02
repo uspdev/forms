@@ -4,6 +4,7 @@ namespace Uspdev\Forms\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Uspdev\Forms\Models\FormDefinition;
 
 class DefinitionController extends Controller
@@ -151,13 +152,14 @@ class DefinitionController extends Controller
             // Grava no formato: tempo_criado => ultima_mod
             $backup_data[$created_time] = $last_mod_time;
         }
-        dd($backup_data);
+
         return view('uspdev-forms::definition.backup-list', ['formDefinition' => $formDefinition, 'backup_data' => $backup_data]);
     }
 
-    public function restore_backup(FormDefinition $definition, $creation_date)
+    public function restore_backup(FormDefinition $formDefinition, $created_time)
     {
-        $filename = $definition->name . $creation_date;
-        dd($filename);
+        $filename = $formDefinition->name . '@' . $created_time . '.json';
+        Artisan::call('form:sync',['--path' => config('uspdev-forms.forms_storage_dir') . '/' .$filename]);
+        return redirect()->back()->with('alert-success','Backup de ' . $created_time . ' restaurado com sucesso !');
     }
 }
