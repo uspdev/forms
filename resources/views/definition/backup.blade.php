@@ -1,8 +1,5 @@
 @extends('uspdev-forms::layouts.app')
 
-@section('header')
-@endsection
-
 @section('content')
 
 <div class="col-2">@include('uspdev-forms::definition.partials.tabs')</div>
@@ -30,14 +27,21 @@
               <td>
                 {{ $formDefinition->name }}
                 <span class="badge badge-warning badge-pill" title="Backups existentes">
-                  {{ count(array_filter(scandir(config('uspdev-forms.forms_storage_dir')), fn($filename) => str_contains($filename,$formDefinition->name))) }}
+                  {{-- 
+                    Verifica se o diretório que guarda os formulários existe.
+                    Caso exista, exibe o número de backups do formulário existem dentro dele.
+                    Senão, mostra 0.
+                  --}}
+                  {{ is_dir(config('uspdev-forms.forms_storage_dir')) ? count(array_filter(scandir(config('uspdev-forms.forms_storage_dir')), fn($filename) => str_contains($filename,$formDefinition->name))) : 0 }}
                 </span>
               </td>
               <td>
                 {{ $formDefinition->group }}
               </td>
               <td class="d-flex justify-content-start align-item-centered">
+                {{-- Botão para gerar o backup da definição --}}
                 @include('uspdev-forms::definition.partials.bckpgen-btn')
+                @include('uspdev-forms::definition.partials.bckplist-btn')
               </td>
             </tr>
           @endforeach
@@ -45,5 +49,6 @@
       </table>
     </div>
   </div>
+{{-- Botão de backup geral (todas as definições, separadamente) --}}
 @include('uspdev-forms::definition.partials.globalbckp-btn')
 @endsection

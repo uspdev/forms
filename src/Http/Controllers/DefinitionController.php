@@ -100,7 +100,7 @@ class DefinitionController extends Controller
             mkdir($file_dir,0777,true);
         }
         
-        $file_path = $file_dir . "/" . $formDefinition['name'] . now()->format('Y-m-d_H-i-s') . ".json";
+        $file_path = $file_dir . "/" . $formDefinition['name'] . '@' . now()->format('d-m-Y_H:i:s') . ".json";
         $json_file = fopen($file_path, "w");
 
         fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -129,5 +129,30 @@ class DefinitionController extends Controller
         $activeTab = 'backup';
         $formDefinitions = FormDefinition::all();
         return view('uspdev-forms::definition.backup', compact('activeTab','formDefinitions'));
+    }
+
+    public function list_backups(FormDefinition $formDefinition)
+    {
+        $bckp_files = scandir(config('uspdev-forms.forms_storage_dir'));
+        $bckp_files = array_filter($bckp_files, function($filename) use ($formDefinition) { return str_contains($filename,$formDefinition->name); });
+            
+        $backup_data = [];
+
+        foreach($bckp_files as $filename)
+        {
+            [$name, $created_time] = explode('@',$filename);
+            $created_time = explode('.',$created_time);
+            $created_time = $created_time[0];
+
+            $created_time = str_replace('-','/',$created_time);
+            $created_time = str_replace('_',' - ',$created_time);
+            
+
+            $last_mod_time = date('d/m/Y - H:i:s',filemtime(config('uspdev-forms.forms_storage_dir') .'/'.$filename));
+
+            $backup_data[$created_time] = $last_mod_time;
+        }
+
+        return view('uspdev-forms::definition.backup-list', ['formDefinition' => $formDefinition, 'backup_data' => $backup_data]);
     }
 }
