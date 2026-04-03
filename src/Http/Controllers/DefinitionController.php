@@ -2,7 +2,9 @@
 
 namespace Uspdev\Forms\Http\Controllers;
 
+use Error;
 use Exception;
+use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Uspdev\Forms\Models\FormDefinition;
@@ -92,7 +94,16 @@ class DefinitionController extends Controller
                 ->with('alert-danger', 'Não foi possível excluir: ' . $e->getMessage());
         }
     }
-
+    /**
+     * Gera o backup de uma definição de formulário.
+     * Inicialmente, verifica a existência do diretório para salvar os arquivos .json,
+     *      caso não exista, o cria.
+     * Após a verificação, cria o arquivo com nome no formato: 'nomedoform@datadacriaçãodobackup.json'
+     * Assim, abre o arquivo e escreve a definição no formato esperado do .json]
+     * 
+     * @param FormDefinition $formDefinition
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function backup_def(FormDefinition $formDefinition)
     {
         
@@ -102,7 +113,7 @@ class DefinitionController extends Controller
             mkdir($file_dir,0777,true);
         }
         
-        $file_path = $file_dir . "/" . $formDefinition['name'] . '@' . now()->format('d-m-Y_H-i-s') . ".json";
+        $file_path = $file_dir . "/" . $formDefinition['name'] . '@' . now()->format('d-m-Y_H:i:s') . ".json";
         $json_file = fopen($file_path, "w");
 
         fwrite($json_file, json_encode($formDefinition,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -112,6 +123,12 @@ class DefinitionController extends Controller
 
     }
 
+    /**
+     * Gera um backup de todas as definições persisitidas no banco de dados
+     * Apenas usa o método 'backup_def' para todas as definições
+     * 
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function backup_all()
         {
             $form_definitions = FormDefinition::all();
@@ -124,18 +141,32 @@ class DefinitionController extends Controller
             return redirect()->back()->with('alert-success','Backups gerados em: ' . now() . ' com sucesso!');
         }
     
+    /**
+     * Exibe informações básicas sobre os backups e definições:
+     *  Definição - número de backups desta definição
+     *  e botões de ação para visualizar e gerar novos backups.
+     * 
+     * @return \Illuminate\Contracts\View\View
+     */
     public function backups_index()
     {
         \UspTheme::activeUrl(route('form-definitions.backups'));
-
+        
+        // Indica que a aba ativa atualmente é a de backups
         $activeTab = 'backup';
         $formDefinitions = FormDefinition::all();
         return view('uspdev-forms::definition.backup', compact('activeTab','formDefinitions'));
     }
 
+    /**
+     * Lista todos os backups de ua definição que existem atualmente
+     * 
+     * @param FormDefinition $formDefinition
+     * @return \Illuminate\Contracts\View\View
+     */
     public function list_backups(FormDefinition $formDefinition)
     {
-        // Pega todos os backups existentes e filtra pelo nome (relacionados à $formDefinition->name)
+        // Percorre todos os backups existentes e filtra pelo nome (relacionados à $formDefinition->name)
         $bckp_files = scandir(config('uspdev-forms.forms_storage_dir'));
         $bckp_files = array_filter($bckp_files, function($filename) use ($formDefinition) { return str_contains($filename,$formDefinition->name); });
             
@@ -147,19 +178,77 @@ class DefinitionController extends Controller
             $created_time = explode('@',$filename)[1];
             $created_time = explode('.',$created_time)[0];
             
-            $last_mod_time = date('d-m-Y_H-i-s',filemtime(config('uspdev-forms.forms_storage_dir') .'/'.$filename));
+            $last_mod_time = date('d-m-Y_H:i:s',filemtime(config('uspdev-forms.forms_storage_dir') .'/'.$filename));
 
-            // Grava no formato: tempo_criado => ultima_mod
+            // Grava no formato: tempo_criado => tempo_ultima_mod
             $backup_data[$created_time] = $last_mod_time;
         }
 
         return view('uspdev-forms::definition.backup-list', ['formDefinition' => $formDefinition, 'backup_data' => $backup_data]);
     }
 
-    public function restore_backup(FormDefinition $formDefinition, $created_time)
+    /**
+     * 'Restaura' um backup específico, subindo as alterações feitas no arquivo para o banco de dados
+     * ou retornando a definição para o estado em que o backup se encontrava na data de criação
+     * 
+     * @param FormDefinition $formDefinition
+     * @param mixed $created_time
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function restore_backup(FormDefinition $formDefinition, string $created_time)
     {
+        // Remonta o tempo de criaão no formato correto
+        $created_time = str_replace(' - ','_',$created_time);
+        $created_time = str_replace('/','-',$created_time);
+
+        // Remonta o nome do arquivo seguindo a formatação nomeform@tempoquecrioubckp.json
         $filename = $formDefinition->name . '@' . $created_time . '.json';
+
+        // Chama o comando 'form:sync', passando o camiho do arquivo desejado como parâmetro, restaurando apenas aquela definição, mantendo intacta as demais
         Artisan::call('form:sync',['--path' => config('uspdev-forms.forms_storage_dir') . '/' .$filename]);
+
         return redirect()->back()->with('alert-success','Backup de ' . $created_time . ' restaurado com sucesso !');
     }
+
+    /**
+     * Remove um arquivo de backup do diretório
+     * 
+     * @param FormDefinition $formDefinition
+     * @param string $created_time
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function remove_backup(FormDefinition $formDefinition, string $created_time)
+    {
+        $created_time = str_replace(' - ','_',$created_time);
+        $created_time = str_replace('/','-',$created_time);
+
+        // Remonta o nome do arquivo
+        $filename = $formDefinition->name . '@' . $created_time . '.json';
+        
+        // Remonta o caminho completo do arquivo
+        $filepath = config('uspdev-forms.forms_storage_dir') . '/' . $filename;
+
+        // Caso o arquivo exista no caminho remontado anteriormente, o remove
+        if(File::exists($filepath))
+        {    
+            File::delete($filepath);
+            return redirect()->back()->with('alert-warning','Backup ' . $filename . ' removido com sucesso.' );
+        }
+
+        // Caso contrário, exibe uma mensagem de erro.
+        else
+        {
+            return redirect()->back()->with('alert-danger', 'Impossível remover ' . $filename .' => arquivo não existe.');
+        }
+    }
+
+    // public function remove_all_bckp()
+    // {
+    //     $files = scandir(config('uspdev-forms.forms_storage_dir'));
+
+    //     foreach($files as $file)
+    //     {
+
+    //     }
+    // }
 }

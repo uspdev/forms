@@ -49,7 +49,6 @@
                 @include('uspdev-forms::definition.partials.show-btn')
                 @include('uspdev-forms::definition.partials.editar-btn')
                 @include('uspdev-forms::definition.partials.delete-btn')
-                @include('uspdev-forms::definition.partials.bckpgen-btn')
                 @includeWhen(
                     $formDefinition->formSubmissions()->onlyTrashed()->count() > 0,
                     'uspdev-forms::definition.partials.delete-trashed-btn')
@@ -60,5 +59,4 @@
       </table>
     </div>
   </div>
-@include('uspdev-forms::definition.partials.globalbckp-btn')
 @endsection

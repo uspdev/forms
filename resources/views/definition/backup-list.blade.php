@@ -6,13 +6,15 @@
     <div class="card-header h4 card-header-sticky d-flex justify-content-between align-items-center">
       <div>
         <span class="text-danger">Definition Backups</span> > {{ $formDefinition->name }} >
-        <a href="{{ route('form-definitions.backups') }}" class="btn btn-sm btn-info ml-2">Voltar</a>
+        <a href="{{ route('form-definitions.backups') }}" class="btn btn-sm btn-outline-secondary ml-2">Voltar</a>
       </div>
       <div>
         @include('uspdev-forms::partials.ajuda-modal')
       </div>
     </div>
     <div class="card-body">
+      <div>@include('uspdev-forms::definition.partials.bckpgen-btn')</div>
+      <br>
       <table class="table table-bordered table-hover">
         <thead>
           <tr>
@@ -25,13 +27,14 @@
           @foreach ($backup_data as $created_time => $updt_time)
             <tr>
               <td>
-                {{ $created_time }}
+                {{ str_replace('_',' - ',str_replace('-','/',$created_time)) }}
               </td>
               <td>
-                {{ $updt_time }}
+                {{ str_replace('_',' - ',str_replace('-','/',$updt_time)) }}
               </td>
               <td class="d-flex justify-content-start align-item-centered">
                 @include('uspdev-forms::definition.partials.restore-btn')
+                @include('uspdev-forms::definition.partials.bckpremove-btn')
               </td>
             </tr>
           @endforeach
