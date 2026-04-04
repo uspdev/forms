@@ -242,13 +242,61 @@ class DefinitionController extends Controller
         }
     }
 
-    // public function remove_all_bckp()
-    // {
-    //     $files = scandir(config('uspdev-forms.forms_storage_dir'));
+    /**
+     * Remove todos os backups de uma definição, filtrando pelo nome
+     * @param FormDefinition $formDefinition
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function remove_def_backups(FormDefinition $formDefinition)
+    {
+        // Recupera o diretório em que os backups são salvos
+        $file_dir = config('uspdev-forms.forms_storage_dir');
 
-    //     foreach($files as $file)
-    //     {
+        // Filtra os arquivos pelos nomes que contém o nome da definição
+        $files = array_filter(scandir($file_dir),function($filename) use ($formDefinition){return str_contains($filename,$formDefinition->name);});
 
-    //     }
-    // }
+        // Percorre todos os arquivos
+        foreach($files as $filename)
+        {
+            // Reconstrói o caminho dos arquivo
+            $filepath = $file_dir . '/' . $filename;
+
+            // Verifica a existência e deleta em caso afirmativo
+            if(File::exists($filepath));
+            {
+                File::delete($filepath);
+            }
+        }
+
+        return redirect()->back()->with('alert-warning', 'Backups de ' . $formDefinition->name . ' removidos com sucesso.');
+    }
+
+    /**
+     * Remove todos os backups de todas as definições
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function remove_all_backup()
+    {
+        // Recupera o diretório em que os arquivos são salvos
+        $file_dir = config('uspdev-forms.forms_storage_dir');
+
+        // Filtra para obter apenas os arquivos .json(evita '.' e '..', além de possível lixo)
+        $files = array_filter(scandir($file_dir), function($file) { return str_contains($file,'.json'); });
+
+        // Percorre todos os arquivos do diretório
+        foreach($files as $filename)
+        {
+            // Reconstrói o caminho do arquivo
+            $filepath = $file_dir . '/' . $filename;
+
+            // Verifica se o mesmo existe, e o deleta em caso afirmativo
+            if(File::exists($filepath))
+            {
+                File::delete($filepath);
+            }
+        }
+
+        return redirect()->back()->with('alert-warning', 'Backups removidos com sucesso.');
+        
+    }
 }

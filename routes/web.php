@@ -15,8 +15,10 @@ Route::group(['prefix' => config('uspdev-forms.prefix'), 'middleware' => ['web']
     Route::get('definitions/{formDefinition}/backup-list',[DefinitionController::class, 'list_backups'])->name('form-definitions.backup-list');
     Route::get('definitions/{formDefinition}/bakcup-def',[DefinitionController::class, 'backup_def'])->name('form-definitions.backup-def');
     Route::get('definitions/backup-all',[DefinitionController::class,'backup_all'])->name('form-definitions.backup-all');
-    Route::get('definitions/{formDefinition}/backup-list/{created_time}/restore',[DefinitionController::class, 'restore_backup'])->name('form-definitions.backup-restore');
-    Route::get('definitions/{formDefinition}/backup-list/{created_time}/remove',[DefinitionController::class, 'remove_backup'])->name('form-definitions.backup-remove');
+    Route::get('definitions/{formDefinition}/backup-list/{created_time}/restore',[DefinitionController::class, 'restore_backup'])->name('form-definitions.def-backup-restore');
+    Route::get('definitions/{formDefinition}/backup-list/{created_time}/remove',[DefinitionController::class, 'remove_backup'])->name('form-definitions.def-backup-remove');
+    Route::get('definitions/{formDefinition}/remove-all',[DefinitionController::class, 'remove_def_backups'])->name('form-definitions.def-backup-remove-all');
+    Route::get('definitions/backup-remove-all' ,[DefinitionController::class, 'remove_all_backup'])->name('form-definitions.backups-remove-all');
 
     Route::get('definitions/{formDefinition}', [DefinitionController::class, 'show'])->name('form-definitions.show');
     Route::get('definitions/{formDefinition}/edit', [DefinitionController::class, 'edit'])->name('form-definitions.edit');

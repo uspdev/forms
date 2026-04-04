@@ -41,7 +41,12 @@
               <td class="d-flex justify-content-start align-item-centered">
                 {{-- Botão para gerar o backup da definição --}}
                 @include('uspdev-forms::definition.partials.bckpgen-btn')
+
+                {{-- Botão para listar todos os backups --}}
                 @include('uspdev-forms::definition.partials.bckplist-btn')
+
+                {{-- Botão para remover todos os backups da definição --}}
+                @includeWhen(count(array_filter(scandir(config('uspdev-forms.forms_storage_dir')), fn($filename) => str_contains($filename,$formDefinition->name))) > 0, 'uspdev-forms::definition.partials.defbckpremoveall-btn')
               </td>
             </tr>
           @endforeach
@@ -49,6 +54,10 @@
       </table>
     </div>
   </div>
+  <br>
 {{-- Botão de backup geral (todas as definições, separadamente) --}}
-<br>@include('uspdev-forms::definition.partials.globalbckp-btn')
+@include('uspdev-forms::definition.partials.globalbckp-btn') 
+
+{{-- Botão para remover todos os backups existentes --}}
+@includeWhen(count(array_filter(scandir(config('uspdev-forms.forms_storage_dir')), fn($filename) => str_contains($filename,'.json'))) > 0, 'uspdev-forms::definition.partials.bckpremoveall-btn')
 @endsection
