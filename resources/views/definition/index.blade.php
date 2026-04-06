@@ -1,7 +1,12 @@
 @extends('uspdev-forms::layouts.app')
 
+@section('header')
+@endsection
+
 @section('content')
-  <div class="card">
+
+<div class="col-2">@include('uspdev-forms::definition.partials.tabs')</div>
+<div class="card">
     <div class="card-header h4 card-header-sticky d-flex justify-content-between align-items-center">
       <div>
         <span class="text-danger">USPdev forms</span> >
@@ -44,7 +49,6 @@
                 @include('uspdev-forms::definition.partials.show-btn')
                 @include('uspdev-forms::definition.partials.editar-btn')
                 @include('uspdev-forms::definition.partials.delete-btn')
-                @include('uspdev-forms::definition.partials.exportdefinition-btn')
                 @includeWhen(
                     $formDefinition->formSubmissions()->onlyTrashed()->count() > 0,
                     'uspdev-forms::definition.partials.delete-trashed-btn')
@@ -56,4 +60,3 @@
     </div>
   </div>
 @endsection
-@include('uspdev-forms::definition.partials.globalexport-btn')

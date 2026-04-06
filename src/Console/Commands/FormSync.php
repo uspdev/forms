@@ -8,7 +8,7 @@ use Uspdev\Forms\Services\FormDefinitionSyncService;
 class FormSync extends Command
 {
     // O nome do comando é "forms:sync" e tem uma opção "--path" para especificar o diretório dos arquivos JSON
-    protected $signature = 'forms:sync {--path= : Diretório com os arquivos .json de formularios}';
+    protected $signature = 'forms:sync {--path= : Diretório com os arquivos .json de formularios} {--all= : Sincronizar todos os formulários}';
     protected $aliases = ['form:sync'];
     protected $description = 'Sincroniza definicoes de formularios a partir de arquivos JSON';
 
@@ -17,28 +17,46 @@ class FormSync extends Command
         // O caminho para sincronização pode ser passado como opção ou definido na configuração
         $syncPath = $this->option('path') ?: config('uspdev-forms.forms_storage_dir');
         $this->info('Sincronizando formularios em: ' . $syncPath);
+        
+        
+        if(is_dir($syncPath))
+        {
+            
+            $result = app(FormDefinitionSyncService::class)->syncFromDirectory($syncPath);
 
-        $result = app(FormDefinitionSyncService::class)->syncFromDirectory($syncPath);
+            $this->line('Arquivos JSON encontrados: ' . $result['total_files']);
+            $this->line('Formularios sincronizados: ' . $result['synced']);
+            $this->line('Criados: ' . $result['created']);
+            $this->line('Atualizados: ' . $result['updated']);
+            $this->line('Sem alteracoes: ' . $result['unchanged']);
 
-        $this->line('Arquivos JSON encontrados: ' . $result['total_files']);
-        $this->line('Formularios sincronizados: ' . $result['synced']);
-        $this->line('Criados: ' . $result['created']);
-        $this->line('Atualizados: ' . $result['updated']);
-        $this->line('Sem alteracoes: ' . $result['unchanged']);
-
-        foreach ($result['messages'] as $message) {
-            $this->line('- ' . $message);
-        }
-
-        if (!empty($result['errors'])) {
-            $this->error('Erros encontrados durante a sincronizacao:');
-            foreach ($result['errors'] as $error) {
-                $this->error('- ' . $error);
+            foreach ($result['messages'] as $message) {
+                $this->line('- ' . $message);
             }
-            return self::FAILURE;
+
+            if (!empty($result['errors'])) {
+                $this->error('Erros encontrados durante a sincronizacao:');
+                foreach ($result['errors'] as $error) {
+                    $this->error('- ' . $error);
+                }
+                return self::FAILURE;
+            }
+
+            $this->info('Sincronizacao concluida com sucesso.');
+            return self::SUCCESS;
         }
 
-        $this->info('Sincronizacao concluida com sucesso.');
-        return self::SUCCESS;
+        elseif(is_file($syncPath))
+        {
+            
+            $content = file_get_contents($syncPath);
+            $definition = json_decode($content,true);
+            app(FormDefinitionSyncService::class)->syncDefinition($definition);
+
+            $this->info('Sincronizacao concluida com sucesso.');
+            return self::SUCCESS;
+        }
+
+        return self::FAILURE;
     }
 }

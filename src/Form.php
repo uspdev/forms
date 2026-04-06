@@ -231,6 +231,20 @@ class Form
         return $rule;
     }
 
+    public static function addFieldGenParams($field)
+    {
+        $field['bs'] = config('uspdev-forms.bootstrapVersion');
+        $field['required'] = isset($field['required']) ? $field['required'] : false;
+        $field['requiredLabel'] = $field['required'] ? ' <span class="text-danger">*</span>' : '';
+        $field['formGroupClass'] = $field['bs'] == 5 ? 'mb-3' : 'form-group';
+        $field['controlClass'] = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
+        $field['id'] = 'uspdev-forms-' . $field['name'];
+
+        $field['old'] = null;
+
+        return $field;
+    }
+
     /**
      * Generates HTML FORM from Form Definition
      *
@@ -292,14 +306,8 @@ class Form
         // tipos de entradas do form conhecidos
         $types = ['textarea', 'select', 'checkbox', 'hidden', 'time', 'date', 'file', 'pessoa-usp', 'disciplina-usp', 'patrimonio-usp', 'local-usp'];
 
-        $field['bs'] = config('uspdev-forms.bootstrapVersion');
-        $field['required'] = isset($field['required']) ? $field['required'] : false;
-        $field['requiredLabel'] = $field['required'] ? ' <span class="text-danger">*</span>' : '';
-        $field['formGroupClass'] = $field['bs'] == 5 ? 'mb-3' : 'form-group';
-        $field['controlClass'] = 'form-control ' . (config('uspdev-forms.formSize') == 'small' ? ' form-control-sm ' : '');
-        $field['id'] = 'uspdev-forms-' . $field['name'];
+        $field = Form::addFieldGenParams($field);
 
-        $field['old'] = null;
         if (isset($formSubmission->data[$field['name']])) {
             $field['old'] = $formSubmission->data[$field['name']];
         }

@@ -45,7 +45,7 @@ class FormDefinitionSyncService
     }
 
     // Sincroniza uma definição de formulário no banco de dados. Retorna 'created', 'updated' ou 'unchanged' dependendo do resultado.
-    protected function syncDefinition(array $definition): string
+    public function syncDefinition(array $definition): string
     {
         $existent = FormDefinition::where('name', $definition['name'])->first();
 
